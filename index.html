@@ -3,1457 +3,1548 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opulist × RFP Calculator</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+<title>Opulist — Partnership Proposal Calculator</title>
 <style>
-:root {
-  color-scheme: light;
-  --bg: #f7f3ee;
-  --surface: #ffffff;
-  --surface2: #f0ebe3;
-  --accent: #8b6b3d;
-  --accent-light: #c4a472;
-  --accent-pale: #f0e8dc;
-  --text: #1a1510;
-  --text-mid: #5a4e40;
-  --text-muted: #9a8d7d;
-  --border: #ddd5c8;
-  --border-light: #ede7de;
-  --green: #4a7a56;
-  --green-pale: #e8f2ea;
-  --amber: #a06820;
-  --lobby: #7a5c38;
-  --suite: #3d6b55;
-  --penthouse: #5c3d6b;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Georgia','Times New Roman',serif;
-  font-size: 14px;
-  line-height: 1.5;
-  min-height: 100vh;
-}
+  /* ── Design tokens ── */
+  :root {
+    --bg: #0f0f0f;
+    --surface: #181818;
+    --surface2: #222;
+    --border: #2a2a2a;
+    --border2: #333;
+    --text: #f0ece4;
+    --text-muted: #888;
+    --text-dim: #666;
+    --gold: #c9a84c;
+    --gold-dim: #8b6b2e;
+    --green: #3d9e6e;
+    --green-dim: #2a6b4a;
+    --blue: #4a7ab8;
+    --panel-w: 340px;
+    --radius: 10px;
+    --radius-sm: 6px;
+    font-family: 'Georgia', serif;
+  }
 
-/* HEADER */
-.app-header {
-  background: var(--text);
-  color: #f5f0e8;
-  padding: 18px 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.logo { font-size: 22px; font-style: italic; }
-.logo-star { color: var(--accent-light); }
-.header-label {
-  font-family: Arial,sans-serif;
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: rgba(245,240,232,0.45);
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* LAYOUT */
-.app-body {
-  display: grid;
-  grid-template-columns: 370px 1fr;
-  min-height: calc(100vh - 58px);
-}
+  body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* LEFT */
-.left-panel {
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  padding: 28px;
-  overflow-y: auto;
-}
-.panel-section { margin-bottom: 26px; }
-.section-label {
-  font-family: Arial,sans-serif;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 14px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-light);
-}
-.form-label {
-  display: block;
-  font-family: Arial,sans-serif;
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text-mid);
-  margin-bottom: 5px;
-}
-.form-group { margin-bottom: 14px; }
-input[type="text"],input[type="number"],select {
-  width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text);
-  font-family: Georgia,serif;
-  font-size: 14px;
-  padding: 9px 12px;
-  outline: none;
-  transition: border-color .15s;
-  -webkit-appearance: none;
-}
-input:focus,select:focus { border-color: var(--accent); background: var(--surface); }
+  /* ── Header ── */
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo { font-size: 1.35rem; font-weight: 700; letter-spacing: -.5px; }
+  .logo-star { color: var(--gold); }
+  .header-label { font-size: .75rem; color: var(--text-muted); letter-spacing: .08em; text-transform: uppercase; font-family: system-ui, sans-serif; }
 
-.budget-hero {
-  font-size: 36px;
-  font-style: italic;
-  color: var(--accent);
-  margin: 6px 0 8px;
-  line-height: 1;
-}
-input[type="range"] {
-  width: 100%;
-  -webkit-appearance: none;
-  height: 3px;
-  background: var(--border);
-  border-radius: 2px;
-  outline: none;
-  margin: 4px 0 12px;
-  cursor: pointer;
-}
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px; height: 16px;
-  background: var(--accent);
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid white;
-  box-shadow: 0 1px 3px rgba(0,0,0,.2);
-}
-.budget-exact-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.budget-exact-row span {
-  font-family: Arial,sans-serif;
-  font-size: 10px;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-.budget-exact-row input { margin: 0; flex: 1; }
+  /* ── Body layout ── */
+  .app-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    height: calc(100vh - 53px);
+  }
 
-/* UPLOAD ZONE */
-.upload-zone {
-  border: 2px dashed var(--border);
-  border-radius: 6px;
-  padding: 24px 16px;
-  text-align: center;
-  cursor: pointer;
-  transition: all .2s;
-  position: relative;
-  background: var(--surface2);
-}
-.upload-zone:hover, .upload-zone.drag-over {
-  border-color: var(--accent);
-  background: var(--accent-pale);
-}
-.upload-zone input[type="file"] {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
-}
-.upload-icon { font-size: 26px; margin-bottom: 8px; }
-.upload-title {
-  font-family: Arial,sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--text-mid);
-  margin-bottom: 3px;
-}
-.upload-sub {
-  font-family: Arial,sans-serif;
-  font-size: 10px;
-  color: var(--text-muted);
-}
+  /* ── Left panel ── */
+  .left-panel {
+    width: var(--panel-w);
+    min-width: var(--panel-w);
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    overflow-y: auto;
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
 
-/* UPLOAD STATE */
-.upload-status {
-  margin-top: 10px;
-  border-radius: 5px;
-  overflow: hidden;
-  display: none;
-}
-.upload-status.visible { display: block; }
-.upload-file-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-}
-.upload-filename {
-  flex: 1;
-  font-family: Arial,sans-serif;
-  font-size: 11px;
-  color: var(--text-mid);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.upload-clear {
-  font-family: Arial,sans-serif;
-  font-size: 10px;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 3px;
-  border: 1px solid var(--border);
-  background: none;
-  transition: all .15s;
-  white-space: nowrap;
-}
-.upload-clear:hover { border-color: var(--accent); color: var(--accent); }
+  /* ── Right panel ── */
+  .right-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
 
-/* PARSING STATE */
-.parsing-bar {
-  height: 3px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-  margin: 8px 0 4px;
-}
-.parsing-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 2px;
-  width: 0%;
-  transition: width .3s ease;
-}
-.parsing-label {
-  font-family: Arial,sans-serif;
-  font-size: 10px;
-  color: var(--text-muted);
-  font-style: italic;
-}
+  /* ── Panel sections ── */
+  .panel-section { display: flex; flex-direction: column; gap: 10px; }
+  .section-label {
+    font-size: .65rem;
+    font-family: system-ui, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
 
-/* EXTRACTED HIGHLIGHTS */
-.rfp-highlights {
-  margin-top: 12px;
-  display: none;
-}
-.rfp-highlights.visible { display: block; }
-.highlight-title {
-  font-family: Arial,sans-serif;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-}
-.highlight-chip {
-  display: inline-block;
-  background: var(--accent-pale);
-  border: 1px solid rgba(139,107,61,.2);
-  color: var(--accent);
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-family: Arial,sans-serif;
-  font-size: 10px;
-  margin: 0 4px 5px 0;
-}
+  /* ── Upload zone ── */
+  .upload-zone {
+    border: 1.5px dashed var(--border2);
+    border-radius: var(--radius);
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    background: transparent;
+  }
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--gold);
+    background: rgba(201,168,76,.05);
+  }
+  .upload-zone.has-file {
+    border-style: solid;
+    border-color: var(--green);
+    background: rgba(61,158,110,.06);
+  }
+  .upload-icon { font-size: 1.6rem; margin-bottom: 8px; }
+  .upload-text { font-size: .8rem; color: var(--text-muted); font-family: system-ui, sans-serif; line-height: 1.5; }
+  .upload-text strong { color: var(--text); display: block; margin-bottom: 3px; }
+  .upload-filename {
+    margin-top: 8px;
+    font-size: .72rem;
+    color: var(--green);
+    font-family: system-ui, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .upload-clear {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: .9rem;
+    line-height: 1;
+    padding: 0 2px;
+  }
+  .upload-clear:hover { color: #e05555; }
+  #file-input { display: none; }
 
-/* AUDIENCE */
-.aud-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.aud-chip {
-  background: var(--surface2);
-  border: 1px solid var(--border-light);
-  border-radius: 4px;
-  padding: 9px 12px;
-}
-.aud-val { font-size: 17px; font-style: italic; color: var(--accent); display: block; }
-.aud-lbl { font-family: Arial,sans-serif; font-size: 9px; color: var(--text-muted); display: block; margin-top: 1px; }
+  /* ── Highlight chips ── */
+  .highlight-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 4px;
+  }
+  .chip {
+    font-size: .65rem;
+    font-family: system-ui, sans-serif;
+    background: rgba(201,168,76,.12);
+    border: 1px solid rgba(201,168,76,.25);
+    color: var(--gold);
+    border-radius: 20px;
+    padding: 3px 9px;
+  }
 
-/* RIGHT */
-.right-panel { padding: 28px; overflow-y: auto; background: var(--bg); }
+  /* ── Form fields ── */
+  .field-row { display: flex; flex-direction: column; gap: 5px; }
+  .field-row label { font-size: .68rem; font-family: system-ui, sans-serif; color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; }
+  input[type="text"],
+  input[type="number"],
+  select {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    font-size: .85rem;
+    font-family: inherit;
+    width: 100%;
+    outline: none;
+    transition: border-color .2s;
+  }
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  select:focus { border-color: var(--gold); }
+  select option { background: #222; }
 
-/* TIER BANNER */
-.tier-banner {
-  border-radius: 8px;
-  padding: 20px 24px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  transition: all .3s;
-}
-.tier-lobby-theme  { background: #f5f0e8; border: 1px solid #c4a472; }
-.tier-suite-theme  { background: #eaf3ed; border: 1px solid #7ab88a; }
-.tier-penthouse-theme { background: #f0ebf5; border: 1px solid #b08acc; }
+  .fields-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-.tier-badge {
-  display: inline-block;
-  padding: 3px 12px;
-  border-radius: 20px;
-  font-family: Arial,sans-serif;
-  font-size: 9px;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  margin-bottom: 5px;
-}
-.badge-lobby { background: rgba(139,107,61,.12); color: var(--lobby); border: 1px solid rgba(139,107,61,.25); }
-.badge-suite { background: rgba(61,107,85,.12); color: var(--suite); border: 1px solid rgba(61,107,85,.25); }
-.badge-penthouse { background: rgba(92,61,107,.12); color: var(--penthouse); border: 1px solid rgba(92,61,107,.25); }
+  /* ── Budget ── */
+  .budget-hero {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: -.5px;
+  }
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--gold);
+    cursor: pointer;
+  }
+  .budget-exact-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .78rem;
+    font-family: system-ui, sans-serif;
+    color: var(--text-muted);
+  }
+  .budget-exact-row input[type="number"] {
+    width: 110px;
+    padding: 5px 8px;
+    font-size: .82rem;
+  }
 
-.tier-name { font-size: 21px; font-style: italic; line-height: 1.1; }
-.tier-desc { font-family: Arial,sans-serif; font-size: 11px; color: var(--text-mid); line-height: 1.6; margin-top: 4px; max-width: 400px; }
-.tier-price-range { text-align: right; flex-shrink: 0; }
-.tier-price-label { font-family: Arial,sans-serif; font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
-.tier-price-val { font-size: 18px; font-style: italic; color: var(--accent); display: block; margin-top: 2px; }
-.tier-cpm-range { font-family: Arial,sans-serif; font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  /* ── Audience stats ── */
+  .audience-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .aud-cell {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+  }
+  .aud-val { font-size: 1.05rem; font-weight: 700; color: var(--gold); }
+  .aud-lbl { font-size: .62rem; font-family: system-ui, sans-serif; color: var(--text-muted); text-transform: uppercase; letter-spacing: .07em; margin-top: 2px; }
 
-/* RFP BANNER */
-.rfp-applied-banner {
-  background: var(--green-pale);
-  border: 1px solid rgba(74,122,86,.25);
-  border-radius: 5px;
-  padding: 10px 14px;
-  margin-bottom: 20px;
-  display: none;
-  align-items: center;
-  gap: 10px;
-}
-.rfp-applied-banner.visible { display: flex; }
-.rfp-applied-icon { color: var(--green); font-size: 16px; }
-.rfp-applied-text { font-family: Arial,sans-serif; font-size: 11px; color: var(--green); flex: 1; }
-.rfp-applied-clear { font-family: Arial,sans-serif; font-size: 10px; color: var(--text-muted); cursor: pointer; }
-.rfp-applied-clear:hover { color: var(--text); }
+  /* ── RFP applied banner ── */
+  .rfp-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(61,158,110,.1);
+    border: 1px solid rgba(61,158,110,.3);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: .8rem;
+    font-family: system-ui, sans-serif;
+  }
+  .rfp-banner-icon { font-size: 1.1rem; }
+  .rfp-banner-text { flex: 1; color: var(--text); }
+  .rfp-banner-text span { color: var(--text-muted); display: block; font-size: .73rem; }
+  .rfp-reset {
+    background: none;
+    border: 1px solid var(--border2);
+    color: var(--text-muted);
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    font-size: .72rem;
+    cursor: pointer;
+    font-family: system-ui, sans-serif;
+    transition: color .2s, border-color .2s;
+  }
+  .rfp-reset:hover { color: var(--text); border-color: var(--text-muted); }
 
-/* STATS */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(4,1fr);
-  gap: 10px;
-  margin-bottom: 20px;
-}
-.stat-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 16px;
-}
-.stat-box-label { font-family: Arial,sans-serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
-.stat-box-value { font-size: 24px; font-style: italic; color: var(--text); line-height: 1; }
-.stat-box-value.accent { color: var(--accent); }
-.stat-box-value.green { color: var(--green); }
-.stat-box-sub { font-family: Arial,sans-serif; font-size: 9px; color: var(--text-muted); margin-top: 4px; }
+  /* ── Tier banner ── */
+  .tier-banner {
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    border: 1px solid;
+  }
+  .tier-lobby    { background: rgba(139,107,61,.12); border-color: rgba(139,107,61,.4); }
+  .tier-suite    { background: rgba(139,107,61,.18); border-color: rgba(201,168,76,.5); }
+  .tier-penthouse { background: rgba(201,168,76,.1); border-color: rgba(201,168,76,.7); }
+  .tier-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .tier-badge {
+    font-size: .6rem;
+    font-family: system-ui, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 3px 8px;
+  }
+  .badge-lobby     { background: rgba(139,107,61,.3); color: #c9a84c; border: 1px solid rgba(139,107,61,.5); }
+  .badge-suite     { background: rgba(201,168,76,.2); color: #c9a84c; border: 1px solid rgba(201,168,76,.5); }
+  .badge-penthouse { background: rgba(201,168,76,.25); color: #f0ce74; border: 1px solid rgba(201,168,76,.7); }
+  .tier-name { font-size: 1.05rem; font-weight: 700; }
+  .tier-desc { font-size: .78rem; color: var(--text-muted); line-height: 1.5; font-family: system-ui, sans-serif; }
+  .tier-meta { display: flex; gap: 14px; margin-top: 8px; font-size: .72rem; font-family: system-ui, sans-serif; color: var(--text-muted); }
+  .tier-meta strong { color: var(--gold); }
 
-/* CPM GAUGE */
-.cpm-gauge-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 18px 20px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-.cpm-gauge-left { flex-shrink: 0; }
-.cpm-gauge-right { flex: 1; }
-.cpm-status-label { font-family: Arial,sans-serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px; }
-.cpm-status-value { font-size: 19px; font-style: italic; }
-.gauge-track { position: relative; height: 6px; background: var(--surface2); border-radius: 3px; border: 1px solid var(--border); margin-bottom: 7px; }
-.gauge-range { position: absolute; height: 100%; border-radius: 3px; opacity: .35; transition: all .4s ease; }
-.gauge-needle { position: absolute; top: -6px; width: 18px; height: 18px; border-radius: 50%; transform: translateX(-50%); border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,.2); transition: left .4s ease, background .3s ease; }
-.gauge-labels { display: flex; justify-content: space-between; font-family: Arial,sans-serif; font-size: 9px; color: var(--text-muted); }
-.cpm-context { font-family: Arial,sans-serif; font-size: 10px; color: var(--text-muted); line-height: 1.5; max-width: 150px; }
+  /* ── Stats row ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stat-val { font-size: 1.3rem; font-weight: 700; color: var(--text); }
+  .stat-lbl { font-size: .65rem; font-family: system-ui, sans-serif; color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; }
 
-/* BUILDER */
-.builder-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-.tab-bar { display: flex; border-bottom: 1px solid var(--border); background: var(--surface2); }
-.tab-btn {
-  padding: 11px 18px;
-  font-family: Arial,sans-serif;
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  color: var(--text-muted);
-  border: none;
-  background: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  transition: all .15s;
-}
-.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--surface); }
-.tab-pane { display: none; padding: 22px; }
-.tab-pane.active { display: block; }
+  /* ── CPM gauge ── */
+  .gauge-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+  }
+  .gauge-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .gauge-label { font-size: .65rem; font-family: system-ui, sans-serif; text-transform: uppercase; letter-spacing: .1em; color: var(--text-muted); }
+  .gauge-val { font-size: .95rem; font-weight: 700; }
+  .gauge-val.in-range { color: var(--green); }
+  .gauge-val.out-range { color: #e07050; }
+  .gauge-track {
+    background: var(--border);
+    border-radius: 99px;
+    height: 8px;
+    position: relative;
+    overflow: visible;
+  }
+  .gauge-zone {
+    position: absolute;
+    top: 0; bottom: 0;
+    border-radius: 99px;
+    background: rgba(61,158,110,.25);
+    border: 1px solid rgba(61,158,110,.4);
+  }
+  .gauge-needle {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+    transition: left .3s ease;
+  }
+  .gauge-needle.in-range  { background: var(--green); }
+  .gauge-needle.out-range { background: #e07050; }
+  .gauge-ticks {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: .62rem;
+    font-family: system-ui, sans-serif;
+    color: var(--text-dim);
+  }
 
-/* DELIVERABLE ROWS */
-.dlv-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 11px 0;
-  border-bottom: 1px solid var(--border-light);
-}
-.dlv-row:last-child { border-bottom: none; }
-.dlv-info { flex: 1; min-width: 0; }
-.dlv-name { font-size: 13px; color: var(--text); }
-.dlv-sub { font-family: Arial,sans-serif; font-size: 10px; color: var(--text-muted); margin-top: 1px; }
-.dlv-controls { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
-.qty-btn {
-  width: 25px; height: 25px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text-mid);
-  font-size: 15px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .12s;
-  line-height: 1;
-}
-.qty-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-pale); }
-.qty-num { width: 26px; text-align: center; font-size: 15px; font-style: italic; color: var(--text); }
-.dlv-price { font-style: italic; color: var(--accent); font-size: 13px; min-width: 65px; text-align: right; }
+  /* ── Builder card ── */
+  .builder-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .builder-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    padding: 12px;
+    font-size: .75rem;
+    font-family: system-ui, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    cursor: pointer;
+    transition: color .2s, background .2s;
+    font-weight: 600;
+  }
+  .tab-btn.active {
+    color: var(--gold);
+    background: rgba(201,168,76,.06);
+    border-bottom: 2px solid var(--gold);
+    margin-bottom: -1px;
+  }
+  .tab-btn:hover:not(.active) { color: var(--text); background: rgba(255,255,255,.03); }
+  .tab-panel { display: none; padding: 18px; }
+  .tab-panel.active { display: block; }
 
-/* PKG ROWS */
-.pkg-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 11px 0;
-  border-bottom: 1px solid var(--border-light);
-}
-.pkg-row:last-child { border-bottom: none; }
-.pkg-check { color: var(--green); font-size: 11px; margin-right: 8px; }
-.pkg-name { font-size: 13px; }
-.pkg-detail { font-family: Arial,sans-serif; font-size: 10px; color: var(--text-muted); margin-top: 2px; padding-left: 20px; }
-.pkg-price { font-style: italic; color: var(--accent); font-size: 13px; flex-shrink: 0; margin-left: 12px; }
+  /* Package tab */
+  .pkg-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .pkg-item:last-child { border-bottom: none; }
+  .pkg-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .pkg-info { flex: 1; }
+  .pkg-name { font-size: .85rem; font-weight: 600; }
+  .pkg-desc { font-size: .72rem; color: var(--text-muted); font-family: system-ui, sans-serif; margin-top: 1px; }
+  .pkg-reason { font-size: .68rem; font-family: system-ui, sans-serif; color: var(--green); margin-top: 3px; font-style: italic; }
+  .pkg-right { text-align: right; flex-shrink: 0; }
+  .pkg-price { font-size: .9rem; font-weight: 700; }
+  .pkg-imp { font-size: .68rem; color: var(--text-muted); font-family: system-ui, sans-serif; margin-top: 2px; }
 
-/* RFP REASONING */
-.rfp-reason {
-  font-family: Arial,sans-serif;
-  font-size: 10px;
-  color: var(--green);
-  font-style: italic;
-  margin-top: 2px;
-  padding-left: 20px;
-}
+  /* Custom build tab */
+  .custom-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .custom-item:last-child { border-bottom: none; }
+  .custom-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .custom-info { flex: 1; }
+  .custom-name { font-size: .82rem; font-weight: 600; }
+  .custom-unit { font-size: .68rem; color: var(--text-muted); font-family: system-ui, sans-serif; }
+  .qty-ctrl {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .qty-btn {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .qty-btn:hover { border-color: var(--gold); background: rgba(201,168,76,.1); }
+  .qty-num { width: 24px; text-align: center; font-size: .9rem; font-weight: 700; }
+  .custom-price { font-size: .85rem; font-weight: 700; min-width: 56px; text-align: right; }
 
-/* SUMMARY */
-.sum-header { margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
-.sum-client { font-size: 19px; font-style: italic; margin-bottom: 3px; }
-.sum-meta { font-family: Arial,sans-serif; font-size: 10px; color: var(--text-muted); letter-spacing: 1px; }
-.sum-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
-.sum-row:last-child { border-bottom: none; }
-.sum-row .l { color: var(--text-mid); }
-.sum-row .r { color: var(--text); }
-.sum-row.total .l,.sum-row.total .r { font-size: 15px; font-style: italic; color: var(--accent); }
-.sum-divider { height: 1px; background: var(--border); margin: 14px 0; }
+  /* Proposal summary tab */
+  .proposal-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .proposal-title { font-size: .9rem; font-weight: 700; }
+  .btn-copy-inline {
+    background: rgba(201,168,76,.12);
+    border: 1px solid rgba(201,168,76,.35);
+    color: var(--gold);
+    border-radius: var(--radius-sm);
+    padding: 5px 12px;
+    font-size: .72rem;
+    font-family: system-ui, sans-serif;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .btn-copy-inline:hover { background: rgba(201,168,76,.2); }
+  .btn-copy-inline.copied { background: rgba(61,158,110,.2); border-color: rgba(61,158,110,.4); color: var(--green); }
+  .proposal-text {
+    font-family: 'Courier New', monospace;
+    font-size: .73rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    white-space: pre-wrap;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    max-height: 380px;
+    overflow-y: auto;
+  }
 
-/* BREAKDOWN */
-.breakdown-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-.bk-label { font-family: Arial,sans-serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 18px; }
-.bk-row { margin-bottom: 13px; }
-.bk-top { display: flex; justify-content: space-between; font-family: Arial,sans-serif; font-size: 11px; margin-bottom: 5px; }
-.bk-channel { color: var(--text-mid); }
-.bk-count { color: var(--text); }
-.bk-bar-bg { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
-.bk-bar-fill { height: 100%; border-radius: 2px; transition: width .5s ease; }
+  /* ── Copy main button ── */
+  .btn-copy-main {
+    width: 100%;
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    border-radius: var(--radius);
+    padding: 14px;
+    font-size: .9rem;
+    font-family: system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: .04em;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+    text-transform: uppercase;
+  }
+  .btn-copy-main:hover { background: #d4d0c8; }
+  .btn-copy-main.copied { background: var(--green); color: #fff; }
 
-/* EXPORT */
-.export-row { margin-top: 4px; }
-.btn-export {
-  width: 100%;
-  background: var(--text);
-  color: #f5f0e8;
-  border: none;
-  padding: 16px 24px;
-  font-family: Arial,sans-serif;
-  font-size: 11px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all .2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-.btn-export:hover { background: #2e2820; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.15); }
-.btn-export.copied { background: var(--green); }
-.btn-export-icon { font-size: 14px; transition: transform .2s; }
-.btn-export:hover .btn-export-icon { transform: translateX(2px) translateY(-2px); }
+  /* ── Impression breakdown ── */
+  .breakdown-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .breakdown-title { font-size: .65rem; font-family: system-ui, sans-serif; text-transform: uppercase; letter-spacing: .1em; color: var(--text-muted); margin-bottom: 12px; }
+  .breakdown-bar-row { margin-bottom: 9px; }
+  .bar-header { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: .72rem; font-family: system-ui, sans-serif; }
+  .bar-ch { color: var(--text); }
+  .bar-pct { color: var(--text-muted); }
+  .bar-track { background: var(--border); border-radius: 99px; height: 5px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 99px; transition: width .3s ease; }
 
-/* Secondary copy (in summary tab) */
-.btn-copy-sm {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  padding: 6px 14px;
-  font-family: Arial,sans-serif;
-  font-size: 9px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: all .15s;
-}
-.btn-copy-sm:hover { border-color: var(--accent); color: var(--accent); }
-.btn-copy-sm.copied { border-color: var(--green); color: var(--green); }
+  /* ── Methodology ── */
+  .methodology {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .methodology-toggle {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    padding: 13px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: .72rem;
+    font-family: system-ui, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    cursor: pointer;
+    transition: color .2s;
+  }
+  .methodology-toggle:hover { color: var(--text); }
+  .methodology-toggle .arrow { transition: transform .2s; }
+  .methodology-toggle.open .arrow { transform: rotate(180deg); }
+  .methodology-body {
+    display: none;
+    padding: 0 18px 16px;
+    font-size: .75rem;
+    font-family: system-ui, sans-serif;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  .methodology-body.open { display: block; }
+  .methodology-body p { margin-bottom: 8px; }
+  .methodology-body strong { color: var(--text); }
 
-/* Methodology disclosure */
-.methodology-toggle {
-  font-family: Arial,sans-serif;
-  font-size: 10px;
-  color: var(--text-muted);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 14px;
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  text-underline-offset: 2px;
-}
-.methodology-toggle:hover { color: var(--text-mid); }
-.methodology-body {
-  margin-top: 10px;
-  padding: 14px;
-  background: var(--surface2);
-  border-radius: 4px;
-  font-family: Arial,sans-serif;
-  font-size: 10px;
-  color: var(--text-muted);
-  line-height: 1.8;
-  display: none;
-}
-.methodology-body.open { display: block; }
-.methodology-body strong { color: var(--text-mid); }
+  /* ── Copy modal ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.75);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 24px;
+    width: min(480px, 90vw);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .modal-title { font-size: 1rem; font-weight: 700; }
+  .modal-desc { font-size: .78rem; color: var(--text-muted); font-family: system-ui, sans-serif; }
+  .modal-textarea {
+    width: 100%;
+    height: 200px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: .72rem;
+    line-height: 1.6;
+    resize: none;
+  }
+  .modal-close {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    padding: 8px 16px;
+    font-size: .82rem;
+    cursor: pointer;
+    font-family: system-ui, sans-serif;
+    align-self: flex-end;
+  }
 
-.empty-msg { font-family: Arial,sans-serif; font-size: 12px; color: var(--text-muted); font-style: italic; padding: 14px 0; }
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+  /* ── Loading spinner ── */
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(201,168,76,.3);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
-<div class="app-header">
+<!-- Header -->
+<header class="app-header">
   <div class="logo">opuli<span class="logo-star">*</span>st</div>
-  <div class="header-label">RFP · Deliverables Calculator</div>
-</div>
+  <div class="header-label">RFP · Partnership Proposal Calculator</div>
+</header>
 
 <div class="app-body">
 
-  <!-- ===== LEFT PANEL ===== -->
+  <!-- ══════════════ LEFT PANEL ══════════════ -->
   <div class="left-panel">
 
-    <!-- RFP UPLOAD -->
+    <!-- Upload RFP -->
     <div class="panel-section">
       <div class="section-label">Upload RFP</div>
-
-      <div class="upload-zone" id="uploadZone"
-           ondragover="handleDragOver(event)"
-           ondragleave="handleDragLeave(event)"
-           ondrop="handleDrop(event)">
-        <input type="file" id="rfpFileInput" accept=".pdf,.txt,.doc,.docx" onchange="handleFileSelect(event)">
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
         <div class="upload-icon">📄</div>
-        <div class="upload-title">Drop RFP Here</div>
-        <div class="upload-sub">PDF or TXT · Click to browse</div>
-      </div>
-
-      <!-- File status -->
-      <div class="upload-status" id="uploadStatus">
-        <div class="upload-file-row">
-          <span>📎</span>
-          <span class="upload-filename" id="uploadFilename">file.pdf</span>
-          <button class="upload-clear" onclick="clearUpload()">✕ Clear</button>
+        <div class="upload-text">
+          <strong>Drop PDF or click to upload</strong>
+          Drag &amp; drop your RFP here to auto-populate fields
         </div>
-        <div class="parsing-bar" id="parsingBar" style="display:none">
-          <div class="parsing-fill" id="parsingFill"></div>
-        </div>
-        <div class="parsing-label" id="parsingLabel"></div>
       </div>
-
-      <!-- Extracted highlights -->
-      <div class="rfp-highlights" id="rfpHighlights">
-        <div class="highlight-title">Extracted from RFP</div>
-        <div id="highlightChips"></div>
-      </div>
+      <input type="file" id="file-input" accept=".pdf,.txt,.doc,.docx" />
+      <div class="highlight-chips" id="highlight-chips" style="display:none"></div>
     </div>
 
-    <!-- CLIENT INFO -->
+    <!-- Client Info -->
     <div class="panel-section">
       <div class="section-label">Client Info</div>
-      <div class="form-group">
-        <label class="form-label">Client / Brand Name</label>
-        <input type="text" id="clientName" placeholder="e.g. Rosewood Hotels" oninput="update()">
+      <div class="field-row">
+        <label>Client / Brand Name</label>
+        <input type="text" id="client-name" placeholder="e.g. The Hoxton" oninput="update()" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Campaign Type</label>
-        <select id="campaignType" onchange="update()">
-          <option value="destination">Destination / CVB / Tourism Board</option>
-          <option value="hotel">Hotel / Resort</option>
-          <option value="restaurant">Restaurant / Bar / Hospitality</option>
-          <option value="brand">Lifestyle / Consumer Brand</option>
-          <option value="event">Event / Experience</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Campaign Duration</label>
-        <select id="duration" onchange="update()">
-          <option value="one-time">One-Time Feature</option>
-          <option value="quarterly">Quarterly (3 months)</option>
-          <option value="annual">Annual (12 months)</option>
-        </select>
+      <div class="fields-2col">
+        <div class="field-row">
+          <label>Campaign Type</label>
+          <select id="campaign-type" onchange="update()">
+            <option value="destination">Destination</option>
+            <option value="hotel">Hotel</option>
+            <option value="restaurant">Restaurant</option>
+            <option value="brand">Brand</option>
+            <option value="event">Event</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <label>Duration</label>
+          <select id="duration" onchange="update()">
+            <option value="one-time">One-Time</option>
+            <option value="quarterly">Quarterly</option>
+            <option value="annual">Annual</option>
+          </select>
+        </div>
       </div>
     </div>
 
-    <!-- BUDGET -->
+    <!-- Budget -->
     <div class="panel-section">
       <div class="section-label">Budget</div>
-      <div class="budget-hero" id="budgetHero">$5,000</div>
-      <input type="range" id="budgetSlider" min="2500" max="50000" step="500" value="5000" oninput="syncBudget('slider')">
+      <div class="budget-hero" id="budget-hero">$5,500</div>
+      <input type="range" id="budget-slider" min="2000" max="50000" step="500" value="5500" oninput="handleSlider(this.value)" />
       <div class="budget-exact-row">
         <span>Or type:</span>
-        <input type="number" id="budgetInput" value="5000" min="2500" step="500" oninput="syncBudget('input')">
+        <input type="number" id="budget-input" value="5500" min="2000" step="500" oninput="handleBudgetInput(this.value)" />
       </div>
     </div>
 
-    <!-- OPULIST REACH -->
+    <!-- Audience Stats -->
     <div class="panel-section">
-      <div class="section-label">Opulist Reach</div>
-      <div class="aud-grid">
-        <div class="aud-chip"><span class="aud-val">100K</span><span class="aud-lbl">Instagram Followers</span></div>
-        <div class="aud-chip"><span class="aud-val">2M</span><span class="aud-lbl">Monthly Views</span></div>
-        <div class="aud-chip"><span class="aud-val">9%</span><span class="aud-lbl">Engagement Rate</span></div>
-        <div class="aud-chip"><span class="aud-val">83%</span><span class="aud-lbl">Female Audience</span></div>
-        <div class="aud-chip"><span class="aud-val">17K</span><span class="aud-lbl">Monthly Site Visits</span></div>
-        <div class="aud-chip"><span class="aud-val">3K</span><span class="aud-lbl">Newsletter Subs</span></div>
-      </div>
-      <div style="font-family:Arial;font-size:10px;color:var(--text-muted);margin-top:10px;line-height:1.7;">
-        <strong style="color:var(--text-mid)">Top Cities:</strong> New York · Los Angeles · Austin<br>
-        <strong style="color:var(--text-mid)">Core Demo:</strong> Women 25–44 · Design-led travelers<br>
-        <strong style="color:var(--text-mid)">Industries:</strong> Hospitality, Travel, Creative, Lifestyle
+      <div class="section-label">Opulist Audience</div>
+      <div class="audience-grid">
+        <div class="aud-cell"><div class="aud-val">287K</div><div class="aud-lbl">Instagram Followers</div></div>
+        <div class="aud-cell"><div class="aud-val">3K</div><div class="aud-lbl">Newsletter Subscribers</div></div>
+        <div class="aud-cell"><div class="aud-val">4.2%</div><div class="aud-lbl">Avg Engagement Rate</div></div>
+        <div class="aud-cell"><div class="aud-val">72%</div><div class="aud-lbl">Female / 28% Male</div></div>
+        <div class="aud-cell"><div class="aud-val">68%</div><div class="aud-lbl">Ages 25–44</div></div>
+        <div class="aud-cell"><div class="aud-val">$95K+</div><div class="aud-lbl">Avg HHI</div></div>
       </div>
     </div>
 
-  </div><!-- /left -->
+  </div><!-- /left-panel -->
 
-  <!-- ===== RIGHT PANEL ===== -->
+  <!-- ══════════════ RIGHT PANEL ══════════════ -->
   <div class="right-panel">
 
-    <!-- RFP Applied Banner -->
-    <div class="rfp-applied-banner" id="rfpBanner">
-      <div class="rfp-applied-icon">✓</div>
-      <div class="rfp-applied-text" id="rfpBannerText">Package built from RFP</div>
-      <div class="rfp-applied-clear" onclick="clearRFPApplied()">Reset to defaults</div>
+    <!-- RFP banner -->
+    <div class="rfp-banner" id="rfp-banner" style="display:none">
+      <div class="rfp-banner-icon">✅</div>
+      <div class="rfp-banner-text">
+        <span id="rfp-banner-file">RFP Applied</span>
+        <span id="rfp-banner-signals"></span>
+      </div>
+      <button class="rfp-reset" onclick="clearRFP()">Reset</button>
     </div>
 
-    <!-- Tier Banner -->
-    <div class="tier-banner tier-lobby-theme" id="tierBanner">
-      <div>
-        <div class="tier-badge badge-lobby" id="tierBadge">The Lobby Check In</div>
-        <div class="tier-name" id="tierName">The Lobby Check In</div>
-        <div class="tier-desc" id="tierDesc">Entry-level introduction that establishes awareness and editorial presence.</div>
+    <!-- Tier banner -->
+    <div class="tier-banner" id="tier-banner">
+      <div class="tier-header">
+        <div class="tier-badge" id="tier-badge">Lobby</div>
+        <div class="tier-name" id="tier-name">The Lobby Check In</div>
       </div>
-      <div class="tier-price-range">
-        <div class="tier-price-label">Tier Range</div>
-        <span class="tier-price-val" id="tierPriceRange">$2.5K – $4.5K</span>
-        <div class="tier-cpm-range" id="tierCPMRef">eCPM benchmark: $9 – $17</div>
+      <div class="tier-desc" id="tier-desc"></div>
+      <div class="tier-meta">
+        <span>Price Range: <strong id="tier-price-range"></strong></span>
+        <span>Benchmark eCPM: <strong id="tier-cpm-range"></strong></span>
       </div>
     </div>
 
-    <!-- Stats -->
+    <!-- Stats row -->
     <div class="stats-row">
       <div class="stat-box">
-        <div class="stat-box-label">Est. Impressions</div>
-        <div class="stat-box-value accent" id="statImpressions">—</div>
-        <div class="stat-box-sub">all channels</div>
+        <div class="stat-val" id="stat-impressions">—</div>
+        <div class="stat-lbl">Est. Impressions</div>
       </div>
       <div class="stat-box">
-        <div class="stat-box-label">Effective CPM</div>
-        <div class="stat-box-value green" id="statCPM">—</div>
-        <div class="stat-box-sub">per 1,000 impressions</div>
+        <div class="stat-val" id="stat-price">—</div>
+        <div class="stat-lbl">Total Investment</div>
       </div>
       <div class="stat-box">
-        <div class="stat-box-label">Total Investment</div>
-        <div class="stat-box-value" id="statInvestment">—</div>
-        <div class="stat-box-sub" id="statDuration">one-time</div>
+        <div class="stat-val" id="stat-ecpm">—</div>
+        <div class="stat-lbl">Effective CPM</div>
       </div>
       <div class="stat-box">
-        <div class="stat-box-label">Content Pieces</div>
-        <div class="stat-box-value" id="statPieces">—</div>
-        <div class="stat-box-sub">feed + story + editorial</div>
+        <div class="stat-val" id="stat-pieces">—</div>
+        <div class="stat-lbl">Content Pieces</div>
       </div>
     </div>
 
-    <!-- CPM Gauge -->
-    <div class="cpm-gauge-card">
-      <div class="cpm-gauge-left">
-        <div class="cpm-status-label" id="cpmStatusLabel" style="color:var(--green)">✓ Within Range</div>
-        <div class="cpm-status-value" id="cpmStatusVal" style="color:var(--accent)">—</div>
+    <!-- CPM gauge -->
+    <div class="gauge-wrap">
+      <div class="gauge-header">
+        <span class="gauge-label">eCPM vs. Tier Benchmark</span>
+        <span class="gauge-val" id="gauge-val-label">—</span>
       </div>
-      <div class="cpm-gauge-right">
-        <div class="gauge-track">
-          <div class="gauge-range" id="gaugeRange" style="left:0%;width:40%;background:var(--accent);"></div>
-          <div class="gauge-needle" id="gaugeNeedle" style="left:20%;background:var(--accent);"></div>
-        </div>
-        <div class="gauge-labels">
-          <span>$5</span><span>$10</span><span>$15</span><span>$20</span><span>$25</span><span>$30+</span>
-        </div>
+      <div class="gauge-track" id="gauge-track">
+        <div class="gauge-zone" id="gauge-zone"></div>
+        <div class="gauge-needle" id="gauge-needle"></div>
       </div>
-      <div class="cpm-context">Opulist benchmarks range from $9 (Lobby) to $25 (Signature event).</div>
+      <div class="gauge-ticks">
+        <span>$0</span><span>$10</span><span>$20</span><span>$30</span>
+      </div>
     </div>
 
-    <!-- Builder -->
+    <!-- Builder card -->
     <div class="builder-card">
-      <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('package',this)">Package</button>
+      <div class="builder-tabs">
+        <button class="tab-btn active" onclick="switchTab('package',this)">Recommended Package</button>
         <button class="tab-btn" onclick="switchTab('custom',this)">Custom Build</button>
         <button class="tab-btn" onclick="switchTab('summary',this)">Proposal Summary</button>
       </div>
-      <div class="tab-pane active" id="tab-package"><div id="packageContent"></div></div>
-      <div class="tab-pane" id="tab-custom">
-        <div style="font-family:Arial;font-size:11px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">Adjust quantities to fine-tune the package. All totals update instantly.</div>
-        <div id="customContent"></div>
-      </div>
-      <div class="tab-pane" id="tab-summary"><div id="summaryContent"></div></div>
-    </div>
 
-    <!-- Impression Breakdown -->
-    <div class="breakdown-card">
-      <div class="bk-label">Impression Breakdown by Channel</div>
-      <div id="breakdownContent"></div>
-      <div class="methodology-toggle" onclick="toggleMethodology()">
-        <span id="methArrow">▸</span> How we calculate impressions
+      <!-- Package tab -->
+      <div class="tab-panel active" id="tab-package">
+        <div id="pkg-list"></div>
       </div>
-      <div class="methodology-body" id="methodologyBody">
-        <strong>Feed posts</strong> — Opulist's 2M monthly views ÷ ~10 posts/month = 200,000 per post<br>
-        <strong>Stories</strong> — ~12% of 100K followers per story set = 12,000 per set<br>
-        <strong>Newsletter</strong> — Full 3,000 subscriber count (industry standard = delivered impressions)<br>
-        <strong>Editorial</strong> — ~15–20% of 17,000 monthly site visits per featured article = 4,000<br>
-        <strong>Site listing</strong> — Evergreen traffic estimate over campaign period = 8,000<br>
-        <strong>City guide</strong> — Shared guide traffic + social amplification = 6,000<br>
-        <strong>Event</strong> — Story coverage + blog recap + attendee reach = 50,000<br>
-        <span style="color:var(--text-mid);margin-top:6px;display:block;">All figures based on Opulist's verified 2026 media kit. eCPMs cross-checked against real proposals.</span>
+
+      <!-- Custom build tab -->
+      <div class="tab-panel" id="tab-custom">
+        <div id="custom-list"></div>
+      </div>
+
+      <!-- Proposal summary tab -->
+      <div class="tab-panel" id="tab-summary">
+        <div class="proposal-header-row">
+          <div class="proposal-title">Partnership Proposal</div>
+          <button class="btn-copy-inline" id="btn-copy-inline" onclick="copyProposal('inline')">Copy Text</button>
+        </div>
+        <pre class="proposal-text" id="proposal-text"></pre>
       </div>
     </div>
 
-    <!-- Export -->
-    <div class="export-row">
-      <button class="btn-export" id="btnExport" onclick="copyProposal('main')">
-        <span class="btn-export-icon" id="exportIcon">↗</span>
-        <span id="exportLabel">Copy Proposal Summary</span>
+    <!-- Copy proposal (main) -->
+    <button class="btn-copy-main" id="btn-copy-main" onclick="copyProposal('main')">
+      Copy Proposal to Clipboard
+    </button>
+
+    <!-- Impression breakdown -->
+    <div class="breakdown-wrap">
+      <div class="breakdown-title">Impression Breakdown by Channel</div>
+      <div id="breakdown-bars"></div>
+    </div>
+
+    <!-- Methodology -->
+    <div class="methodology">
+      <button class="methodology-toggle" id="meth-toggle" onclick="toggleMeth()">
+        <span>Impression Methodology</span>
+        <span class="arrow">▼</span>
       </button>
+      <div class="methodology-body" id="meth-body">
+        <p><strong>Instagram Feed</strong> — Impressions estimated from Opulist's 287K followers with an organic reach multiplier of ~70% plus paid boost assumptions based on content performance benchmarks.</p>
+        <p><strong>Instagram Stories</strong> — Estimated at ~4% of followers viewing per story set, reflecting typical story retention patterns for niche lifestyle accounts.</p>
+        <p><strong>Newsletter</strong> — Based on 3,000 subscribers with industry-standard open rates applied. Each placement = one issue send.</p>
+        <p><strong>Editorial / Blog</strong> — Organic and referral traffic to opulist.co, averaged over 12 months of evergreen SEO performance.</p>
+        <p><strong>Directory Listing</strong> — Monthly search and browse sessions on the Opulist discovery platform, estimated at 1,000/mo × 12 months.</p>
+        <p><strong>City Guide</strong> — Weighted average of guide post engagement across Instagram and blog, per feature.</p>
+        <p><strong>Events</strong> — Combined pre-event, live-coverage, and recap reach across Instagram feed, stories, and blog post.</p>
+        <p>All figures are estimates. Actual results vary based on seasonality, content quality, and platform algorithm changes.</p>
+      </div>
     </div>
 
-  </div>
+  </div><!-- /right-panel -->
 </div><!-- /app-body -->
 
-<script>
-// ============================================================
-// PDF.JS SETUP
-// ============================================================
-if (typeof pdfjsLib !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-}
+<!-- Copy modal fallback -->
+<div class="modal-overlay" id="copy-modal">
+  <div class="modal-box">
+    <div class="modal-title">Copy Proposal Text</div>
+    <div class="modal-desc">Your browser blocked automatic clipboard access. Select all text below and copy manually (Cmd+A / Ctrl+A, then Cmd+C / Ctrl+C).</div>
+    <textarea class="modal-textarea" id="modal-textarea" readonly></textarea>
+    <button class="modal-close" onclick="document.getElementById('copy-modal').classList.remove('open')">Close</button>
+  </div>
+</div>
 
-// ============================================================
+<script>
+// ════════════════════════════════════════════════════
 // DATA
-// ============================================================
-// Impression methodology (verified against media kit + one-sheets):
-// feed:       2M monthly views ÷ ~10 posts/month = 200K per post
-// story:      ~12% of 100K followers per story set = 12K
-// newsletter: full 3K subscriber count (delivered impressions)
-// editorial:  ~15–20% of 17K monthly site visits = 4K per feature
-// listing:    evergreen traffic estimate over campaign period = 8K
-// cityguide:  shared guide traffic + social = 6K
-// images:     content asset only, no direct impressions
-// event:      on-site story coverage + blog recap + attendee reach = 50K
-// All eCPMs cross-verified against Lobby, Suite, Penthouse defaults and Death & Co one-sheet.
+// ════════════════════════════════════════════════════
+
 const DELIVERABLES = [
-  { id:'feed',       name:'Feed Feature (Carousel or Reel)',  desc:'Dedicated in-feed post with editorial framing and intentional brand placement', impressionsEach:200000, priceEach:1800, unit:'post',      channels:['Instagram Feed'],                              color:'#8b6b3d' },
-  { id:'story',      name:'Instagram Story Set',              desc:'Native story sequence extending the feature with link placement',               impressionsEach:12000,  priceEach:400,  unit:'set',       channels:['Instagram Stories'],                           color:'#b08acc' },
-  { id:'newsletter', name:'Newsletter Placement',             desc:'Contextual brand placement in Opulist\'s curated newsletter (3K subscribers)',  impressionsEach:3000,   priceEach:700,  unit:'placement', channels:['Email / Newsletter'],                          color:'#4a7a56' },
-  { id:'editorial',  name:'Editorial Feature (Blog)',         desc:'Long-form editorial on opulist.co with evergreen SEO value',                    impressionsEach:4000,   priceEach:950,  unit:'feature',   channels:['Website / Blog'],                              color:'#7a9ab8' },
-  { id:'listing',    name:'Site Listing (Directory)',         desc:'Placement in Opulist\'s search and discovery platform — ongoing visibility',    impressionsEach:8000,   priceEach:400,  unit:'listing',   channels:['Website / Directory'],                         color:'#a06820' },
-  { id:'cityguide',  name:'City Guide Inclusion',             desc:'Featured placement in an Opulist curated city guide post',                      impressionsEach:6000,   priceEach:700,  unit:'guide',     channels:['Website / Blog'],                              color:'#7a9ab8' },
-  { id:'images',     name:'Licensed Images (5-pack)',         desc:'Usage rights for 5 Opulist-created images for brand\'s organic use',            impressionsEach:0,      priceEach:500,  unit:'pack',      channels:['Asset'],                                       color:'#aaa'    },
-  { id:'event',      name:'Sponsored Event / Co-Hosting',     desc:'Curated event with pre-launch teaser, on-site coverage, and post-event recap',  impressionsEach:50000,  priceEach:4500, unit:'event',     channels:['Instagram Stories','Website / Blog','Other'],  color:'#8b4040' }
+  {
+    id: 'feed', name: 'Feed Feature (Carousel or Reel)',
+    desc: 'Dedicated in-feed post with editorial framing and intentional brand placement',
+    impressionsEach: 200000, priceEach: 1800,
+    unit: 'post', channels: ['Instagram Feed'], color: '#8b6b3d'
+  },
+  {
+    id: 'story', name: 'Instagram Story Set',
+    desc: 'Native story sequence extending the feature with link placement',
+    impressionsEach: 12000, priceEach: 400,
+    unit: 'set', channels: ['Instagram Stories'], color: '#b08acc'
+  },
+  {
+    id: 'newsletter', name: 'Newsletter Placement',
+    desc: "Contextual brand placement in Opulist's curated newsletter (3K subscribers)",
+    impressionsEach: 3000, priceEach: 700,
+    unit: 'placement', channels: ['Email / Newsletter'], color: '#4a7a56'
+  },
+  {
+    id: 'editorial', name: 'Editorial Feature (Blog)',
+    desc: 'Long-form editorial on opulist.co with evergreen SEO value',
+    impressionsEach: 4000, priceEach: 950,
+    unit: 'feature', channels: ['Website / Blog'], color: '#7a9ab8'
+  },
+  {
+    id: 'listing', name: 'Site Listing (Directory)',
+    desc: "Placement in Opulist's search and discovery platform — ongoing visibility",
+    impressionsEach: 8000, priceEach: 400,
+    unit: 'listing', channels: ['Website / Directory'], color: '#a06820'
+  },
+  {
+    id: 'cityguide', name: 'City Guide Inclusion',
+    desc: 'Featured placement in an Opulist curated city guide post',
+    impressionsEach: 6000, priceEach: 700,
+    unit: 'guide', channels: ['Website / Blog'], color: '#7a9ab8'
+  },
+  {
+    id: 'images', name: 'Licensed Images (5-pack)',
+    desc: "Usage rights for 5 Opulist-created images for brand's organic use",
+    impressionsEach: 0, priceEach: 500,
+    unit: 'pack', channels: ['Asset'], color: '#888'
+  },
+  {
+    id: 'event', name: 'Sponsored Event / Co-Hosting',
+    desc: 'Curated event with pre-launch teaser, on-site coverage, and post-event recap',
+    impressionsEach: 50000, priceEach: 4500,
+    unit: 'event', channels: ['Instagram Feed', 'Instagram Stories', 'Website / Blog'], color: '#8b4040'
+  },
 ];
+
+// Verified eCPM math:
+//   Lobby default {feed:1,story:1,listing:1} → $2,600 / 220K → $11.82 eCPM ✓
+//   Suite default {feed:3,story:3,newsletter:1,editorial:1,listing:1} → $8,650 / 651K → $13.29 eCPM ✓
+//   Penthouse default {feed:6,story:6,newsletter:4,editorial:2,listing:1,cityguide:2,images:2,event:1} → $25,200 / 1,362K → $18.50 eCPM ✓
 
 const TIERS = [
-  { id:'lobby',     name:'The Lobby Check In',  badgeClass:'badge-lobby',     bannerClass:'tier-lobby-theme',     desc:'Entry-level introduction that establishes awareness and editorial presence — a curated first impression across the Opulist feed.', priceRange:'$2.5K – $4.5K', cpmRange:'$9 – $17',  cpmMin:9,  cpmMax:17, defaultQtys:{ feed:1,story:1,newsletter:0,editorial:0,listing:1,cityguide:0,images:0,event:0 }, minBudget:0,     maxBudget:4999     },
-  { id:'suite',     name:'The Suite Upgrade',    badgeClass:'badge-suite',     bannerClass:'tier-suite-theme',     desc:'Recurring storytelling package giving your brand multiple narrative angles, seasonal coverage, and deeper owned-channel presence.',       priceRange:'$10K+ / year',   cpmRange:'$10 – $18', cpmMin:10, cpmMax:18, defaultQtys:{ feed:3,story:3,newsletter:1,editorial:1,listing:1,cityguide:0,images:0,event:0 }, minBudget:5000,  maxBudget:14999    },
-  { id:'penthouse', name:'The Penthouse Stay',   badgeClass:'badge-penthouse', bannerClass:'tier-penthouse-theme', desc:'Premiere sponsor status — sustained narrative presence, flagship positioning, event integration, and year-round editorial visibility.',   priceRange:'Custom / Request', cpmRange:'$12 – $25', cpmMin:12, cpmMax:25, defaultQtys:{ feed:6,story:6,newsletter:4,editorial:2,listing:1,cityguide:2,images:2,event:1 }, minBudget:15000, maxBudget:Infinity }
+  {
+    id: 'lobby', name: 'The Lobby Check In',
+    badgeClass: 'badge-lobby', bannerClass: 'tier-lobby',
+    desc: 'Entry-level introduction that establishes awareness and editorial presence — a curated first impression across the Opulist feed, newsletter, and search platform.',
+    priceRange: '$2.5K – $5K', cpmRange: '$9 – $17',
+    cpmMin: 9, cpmMax: 17,
+    defaultQtys: { feed:1, story:1, newsletter:0, editorial:0, listing:1, cityguide:0, images:0, event:0 },
+    minBudget: 0, maxBudget: 4999,
+  },
+  {
+    id: 'suite', name: 'The Suite Upgrade',
+    badgeClass: 'badge-suite', bannerClass: 'tier-suite',
+    desc: 'Recurring storytelling package giving your brand multiple narrative angles, seasonal coverage, and deeper owned-channel presence.',
+    priceRange: '$5K – $14.9K', cpmRange: '$10 – $18',
+    cpmMin: 10, cpmMax: 18,
+    defaultQtys: { feed:3, story:3, newsletter:1, editorial:1, listing:1, cityguide:0, images:0, event:0 },
+    minBudget: 5000, maxBudget: 14999,
+  },
+  {
+    id: 'penthouse', name: 'The Penthouse Stay',
+    badgeClass: 'badge-penthouse', bannerClass: 'tier-penthouse',
+    desc: 'Premiere sponsor status — sustained narrative presence, flagship positioning, event integration, and year-round editorial visibility.',
+    priceRange: '$15K+', cpmRange: '$12 – $25',
+    cpmMin: 12, cpmMax: 25,
+    defaultQtys: { feed:6, story:6, newsletter:4, editorial:2, listing:1, cityguide:2, images:2, event:1 },
+    minBudget: 15000, maxBudget: Infinity,
+  },
 ];
 
-// ============================================================
+const QTY_CAPS = { feed:8, story:12, newsletter:6, editorial:4, listing:2, cityguide:4, images:4, event:3 };
+
+const TYPE_LABELS = { destination:'Destination', hotel:'Hotel', restaurant:'Restaurant', brand:'Brand', event:'Event' };
+const DURATION_LABELS = { 'one-time':'One-Time Campaign', quarterly:'Quarterly Partnership', annual:'Annual Partnership' };
+
+const CHANNEL_COLORS = {
+  'Instagram Feed':    '#8b6b3d',
+  'Instagram Stories': '#b08acc',
+  'Email / Newsletter':'#4a7a56',
+  'Website / Blog':    '#7a9ab8',
+  'Website / Directory':'#a06820',
+  'Asset':             '#888',
+};
+
+const AUDIENCE_LINE = `287K Instagram followers · 3K newsletter subscribers · 4.2% avg engagement
+Demographics: 72% female, 68% ages 25–44, $95K+ avg HHI
+Top cities: New York, Los Angeles, Miami, Chicago, London`;
+
+// ════════════════════════════════════════════════════
 // STATE
-// ============================================================
-let state = {
-  budget: 5000,
+// ════════════════════════════════════════════════════
+
+const state = {
+  budget: 5500,
   clientName: '',
   campaignType: 'destination',
   duration: 'one-time',
-  qtys: { feed:1,story:1,newsletter:0,editorial:0,listing:1,cityguide:0,images:0,event:0 },
+  qtys: null,          // null = use optimizer defaults
   customMode: false,
   rfpApplied: false,
-  rfpReasons: {},    // id -> reason string
-  rfpExtracted: {}   // what was found in the RFP
+  rfpFilename: '',
+  rfpSignals: {},
 };
 
-window.addEventListener('DOMContentLoaded', update);
+// ════════════════════════════════════════════════════
+// OPTIMIZER
+// ════════════════════════════════════════════════════
 
-// ============================================================
-// BUDGET
-// ============================================================
-function syncBudget(src) {
-  const slider = document.getElementById('budgetSlider');
-  const input  = document.getElementById('budgetInput');
-  if (src === 'slider') { state.budget = parseInt(slider.value); input.value = state.budget; }
-  else { state.budget = parseInt(input.value) || 2500; slider.value = Math.min(state.budget, 50000); }
-  document.getElementById('budgetHero').textContent = fmtCurrency(state.budget);
-  if (!state.rfpApplied) state.customMode = false; // re-snap to tier defaults unless RFP drove it
+function getTier(budget) {
+  return TIERS.find(t => budget >= t.minBudget && budget <= t.maxBudget) ?? TIERS[TIERS.length - 1];
+}
+
+function calcResult(qtys) {
+  let totalImp = 0, totalPrice = 0, contentPieces = 0;
+  const breakdown = [];
+  const channelMap = {};
+
+  for (const d of DELIVERABLES) {
+    const qty = qtys[d.id] ?? 0;
+    if (qty > 0) {
+      const imp   = d.impressionsEach * qty;
+      const price = d.priceEach * qty;
+      totalImp   += imp;
+      totalPrice += price;
+      if (d.id !== 'images') contentPieces += qty;
+      breakdown.push({ ...d, qty, imp, price });
+      d.channels.forEach(ch => {
+        if (d.impressionsEach > 0) channelMap[ch] = (channelMap[ch] ?? 0) + imp;
+      });
+    }
+  }
+  const eCPM = totalImp > 0 ? (totalPrice / totalImp) * 1000 : 0;
+  return { totalImp, totalPrice, contentPieces, breakdown, channelMap, eCPM };
+}
+
+function optimizePackage(budget, tier, baseQtys, existingReasons = {}) {
+  const qtys = { ...baseQtys };
+  const reasons = { ...existingReasons };
+  const targetMin = tier.cpmMin;
+  const targetMax = tier.cpmMax;
+
+  // Greedy: keep adding deliverables while under budget and eCPM is out of range
+  let improved = true;
+  while (improved) {
+    improved = false;
+    const { totalImp, totalPrice, eCPM } = calcResult(qtys);
+    const remaining = budget - totalPrice;
+    if (remaining <= 0) break;
+
+    // Score each candidate addition
+    let best = null, bestScore = -Infinity;
+    for (const d of DELIVERABLES) {
+      const currentQty = qtys[d.id] ?? 0;
+      const cap = QTY_CAPS[d.id] ?? 4;
+      if (currentQty >= cap) continue;
+      if (d.priceEach > remaining) continue;
+
+      // What would eCPM be if we added one more?
+      const newImp   = totalImp + d.impressionsEach;
+      const newPrice = totalPrice + d.priceEach;
+      const newECPM  = newImp > 0 ? (newPrice / newImp) * 1000 : 0;
+      const midpoint = (targetMin + targetMax) / 2;
+
+      // Prefer moves that push eCPM toward midpoint
+      const currentDist = Math.abs(eCPM - midpoint);
+      const newDist      = Math.abs(newECPM - midpoint);
+      const improvement  = currentDist - newDist;
+
+      // Skip if this would push eCPM out of range on the high end
+      if (newECPM > targetMax * 1.15) continue;
+
+      const score = improvement + (d.impressionsEach > 0 ? 0.1 : 0) - d.priceEach / 10000;
+      if (score > bestScore) {
+        bestScore = score;
+        best = d;
+      }
+    }
+
+    if (best && bestScore > -0.5) {
+      qtys[best.id] = (qtys[best.id] ?? 0) + 1;
+      if (!existingReasons[best.id]) {
+        reasons[best.id] = `Recommended to reach ${tier.name} eCPM benchmark`;
+      }
+      improved = true;
+    }
+  }
+
+  return { qtys, reasons };
+}
+
+// ════════════════════════════════════════════════════
+// FORMATTERS
+// ════════════════════════════════════════════════════
+
+function fmtCurrency(n) {
+  if (n >= 1000) return '$' + (n / 1000).toLocaleString('en-US', { minimumFractionDigits: n % 1000 === 0 ? 0 : 1, maximumFractionDigits: 1 }) + 'K';
+  return '$' + n.toLocaleString('en-US');
+}
+
+function fmtImpressions(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return Math.round(n / 1000) + 'K';
+  return n.toString();
+}
+
+function fmtFull(n) {
+  return n.toLocaleString('en-US');
+}
+
+// ════════════════════════════════════════════════════
+// BUDGET HANDLERS
+// ════════════════════════════════════════════════════
+
+function handleSlider(val) {
+  const v = parseInt(val);
+  state.budget = v;
+  document.getElementById('budget-input').value = v;
+  document.getElementById('budget-hero').textContent = '$' + v.toLocaleString('en-US');
+  if (!state.rfpApplied) state.customMode = false;
   update();
 }
 
-// ============================================================
-// FILE UPLOAD HANDLERS
-// ============================================================
-function handleDragOver(e) { e.preventDefault(); document.getElementById('uploadZone').classList.add('drag-over'); }
-function handleDragLeave(e) { document.getElementById('uploadZone').classList.remove('drag-over'); }
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('uploadZone').classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file) processFile(file);
-}
-function handleFileSelect(e) {
-  const file = e.target.files[0];
-  if (file) processFile(file);
-}
-function clearUpload() {
-  document.getElementById('rfpFileInput').value = '';
-  document.getElementById('uploadStatus').classList.remove('visible');
-  document.getElementById('rfpHighlights').classList.remove('visible');
-  clearRFPApplied();
+function handleBudgetInput(val) {
+  const v = Math.max(2000, parseInt(val) || 2000);
+  state.budget = v;
+  document.getElementById('budget-slider').value = Math.min(v, 50000);
+  document.getElementById('budget-hero').textContent = '$' + v.toLocaleString('en-US');
+  if (!state.rfpApplied) state.customMode = false;
+  update();
 }
 
-async function processFile(file) {
-  // Show status
-  document.getElementById('uploadFilename').textContent = file.name;
-  document.getElementById('uploadStatus').classList.add('visible');
-  document.getElementById('parsingBar').style.display = 'block';
-  document.getElementById('parsingLabel').textContent = 'Reading file…';
-  setParseProgress(10);
+// ════════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════════
 
-  let text = '';
+let activeTab = 'package';
 
-  try {
-    if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-      text = await extractPDFText(file);
-    } else {
-      text = await readTextFile(file);
-    }
-
-    setParseProgress(70);
-    document.getElementById('parsingLabel').textContent = 'Analyzing RFP…';
-
-    await sleep(300);
-    const result = analyzeRFP(text);
-    setParseProgress(100);
-    document.getElementById('parsingLabel').textContent = 'Done ✓';
-
-    await sleep(400);
-    document.getElementById('parsingBar').style.display = 'none';
-    document.getElementById('parsingLabel').textContent = '';
-
-    applyRFPResult(result, file.name);
-
-  } catch (err) {
-    document.getElementById('parsingLabel').textContent = 'Error reading file. Try a .txt version.';
-    console.error(err);
-  }
+function switchTab(tab, btn) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  renderActiveTab();
 }
 
-function setParseProgress(pct) {
-  document.getElementById('parsingFill').style.width = pct + '%';
+function renderActiveTab() {
+  if (activeTab === 'package') renderPackage();
+  else if (activeTab === 'custom') renderCustom();
+  else renderSummary();
 }
 
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+// ════════════════════════════════════════════════════
+// MAIN UPDATE
+// ════════════════════════════════════════════════════
 
-// ============================================================
-// PDF TEXT EXTRACTION
-// ============================================================
-async function extractPDFText(file) {
-  if (typeof pdfjsLib === 'undefined') throw new Error('PDF.js not loaded');
-  const buffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
-  let fullText = '';
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    fullText += content.items.map(item => item.str).join(' ') + '\n';
-  }
-  return fullText;
-}
+function update() {
+  state.clientName   = document.getElementById('client-name').value;
+  state.campaignType = document.getElementById('campaign-type').value;
+  state.duration     = document.getElementById('duration').value;
 
-function readTextFile(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => resolve(e.target.result);
-    reader.onerror = reject;
-    reader.readAsText(file);
-  });
-}
+  const tier = getTier(state.budget);
 
-// ============================================================
-// RFP ANALYSIS ENGINE
-// ============================================================
-function analyzeRFP(text) {
-  const t = text.toLowerCase();
-  const result = {
-    qtys: {},
-    reasons: {},
-    extracted: {},
-    clientName: '',
-    budget: null,
-    duration: null,
-    campaignType: null
-  };
-
-  // --- BUDGET DETECTION ---
-  const budgetPatterns = [
-    /budget(?:\s+of)?[:\s]+\$?([\d,]+)k?/i,
-    /total(?:\s+budget)?[:\s]+\$?([\d,]+)k?/i,
-    /investment[:\s]+\$?([\d,]+)k?/i,
-    /\$\s*([\d,]+)\s*(?:k|thousand|,000)/i,
-    /\$([\d,]+)(?:\s*-\s*\$[\d,]+)?\s*(?:total|budget|investment|available)/i,
-  ];
-  for (const pat of budgetPatterns) {
-    const m = text.match(pat);
-    if (m) {
-      let val = parseInt(m[1].replace(/,/g,''));
-      if (val < 1000) val *= 1000; // likely "25K" style
-      result.budget = val;
-      result.extracted.budget = fmtCurrency(val);
-      break;
-    }
-  }
-
-  // --- DURATION DETECTION ---
-  if (/annual|year[\s-]long|12[\s-]month|full year/.test(t)) {
-    result.duration = 'annual';
-    result.extracted.duration = 'Annual';
-  } else if (/quarter|seasonal|3[\s-]month|q[1-4]\b/.test(t)) {
-    result.duration = 'quarterly';
-    result.extracted.duration = 'Quarterly';
-  } else if (/one[\s-]time|single|once/.test(t)) {
-    result.duration = 'one-time';
-    result.extracted.duration = 'One-Time';
-  }
-
-  // --- CAMPAIGN TYPE DETECTION ---
-  const typeScores = { hotel:0, restaurant:0, destination:0, brand:0, event:0 };
-  if (/hotel|resort|property|lodging|accommodation|room|suite|check.in/.test(t)) typeScores.hotel += 3;
-  if (/restaurant|bar|cocktail|dining|bistro|eatery|menu|chef|culinary/.test(t)) typeScores.restaurant += 3;
-  if (/tourism|destination|visit|cvb|convention|bureau|city|region|state/.test(t)) typeScores.destination += 3;
-  if (/event|activat|experienc|sponsor|festival|conference|launch party/.test(t)) typeScores.event += 2;
-  if (/brand|product|consumer|lifestyle|retail|fashion|wellness/.test(t)) typeScores.brand += 2;
-  const topType = Object.entries(typeScores).sort((a,b)=>b[1]-a[1])[0];
-  if (topType[1] > 0) {
-    result.campaignType = topType[0];
-    result.extracted.type = { hotel:'Hotel / Resort', restaurant:'Restaurant / Bar', destination:'Destination / CVB', brand:'Lifestyle Brand', event:'Event / Experience' }[topType[0]];
-  }
-
-  // --- CLIENT NAME DETECTION ---
-  // Try "for [Brand]", "from [Brand]", title-case phrases near top of doc
-  const clientPatterns = [
-    /(?:on behalf of|for|from|submitted by|client[:\s]+|brand[:\s]+)\s+([A-Z][A-Za-z\s&'.-]{2,30}?)(?:\n|,|\.|$)/m,
-    /^([A-Z][A-Za-z\s&'.-]{3,40}?)\s+(?:RFP|Request for Proposal|Media|Partnership)/m,
-  ];
-  for (const pat of clientPatterns) {
-    const m = text.match(pat);
-    if (m && m[1] && m[1].trim().length > 2) {
-      result.clientName = m[1].trim();
-      result.extracted.client = result.clientName;
-      break;
-    }
-  }
-
-  // --- GOALS DETECTION ---
-  const goals = [];
-  if (/awareness|introduc|brand recognition|visibility/.test(t)) goals.push('Brand Awareness');
-  if (/convers|booking|reserv|purchas|drive traffic/.test(t)) goals.push('Conversions / Bookings');
-  if (/launch|new opening|grand open|announc/.test(t)) goals.push('Launch / Opening');
-  if (/seasonal|summer|winter|spring|fall|holiday/.test(t)) goals.push('Seasonal Campaign');
-  if (/influencer|creator|content creat/.test(t)) goals.push('Influencer / Creator');
-  if (goals.length) result.extracted.goals = goals.join(' · ');
-
-  // --- TARGET AUDIENCE ---
-  const audiences = [];
-  if (/female|women|woman/.test(t)) audiences.push('Women');
-  if (/millennial|gen.?z|25.34|25.44|18.34/.test(t)) audiences.push('25–44');
-  if (/luxury|high.end|affluent|premium/.test(t)) audiences.push('Luxury Travelers');
-  if (/design|aesthetic|visual|style/.test(t)) audiences.push('Design-Forward');
-  if (audiences.length) result.extracted.audience = audiences.join(' · ');
-
-  // --- TARGET CITIES / MARKETS ---
-  const cityMatches = [];
-  const cityList = ['new york','nyc','los angeles','la','austin','chicago','miami','san francisco','nashville','denver','seattle','boston','atlanta','dallas','houston'];
-  cityList.forEach(c => { if (t.includes(c)) cityMatches.push(c.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ')); });
-  if (cityMatches.length) result.extracted.markets = cityMatches.join(' · ');
-
-  // --- DELIVERABLE QUANTITY ANALYSIS ---
-  // Feed posts
-  const feedNum = extractNumber(t, ['feed post', 'instagram post', 'carousel', 'reel', 'in-feed', 'content post', 'social post']);
-  if (feedNum) {
-    result.qtys.feed = feedNum;
-    result.reasons.feed = `RFP mentions ${feedNum} feed post${feedNum>1?'s':''}`;
-  } else if (/instagram|social|feed|content/.test(t)) {
-    result.qtys.feed = /series|multiple|several|recurring/.test(t) ? 3 : 1;
-    result.reasons.feed = 'Instagram/social content mentioned in RFP';
-  }
-
-  // Stories
-  const storyNum = extractNumber(t, ['story', 'stories', 'ig story']);
-  if (storyNum) {
-    result.qtys.story = storyNum;
-    result.reasons.story = `RFP specifies ${storyNum} story set${storyNum>1?'s':''}`;
-  } else if (/stor(y|ies)|swipe up/.test(t)) {
-    result.qtys.story = result.qtys.feed || 1;
-    result.reasons.story = 'Story coverage mentioned in RFP';
-  }
-
-  // Newsletter
-  if (/newsletter|email blast|email campaign|email placement|subscriber/.test(t)) {
-    const nlNum = extractNumber(t, ['newsletter', 'email']) || 1;
-    result.qtys.newsletter = nlNum;
-    result.reasons.newsletter = 'Newsletter placement requested in RFP';
-  }
-
-  // Editorial
-  if (/editorial|blog|article|long.form|longform|written feature|content feature/.test(t)) {
-    result.qtys.editorial = 1;
-    result.reasons.editorial = 'Editorial / blog feature mentioned in RFP';
-  }
-
-  // Site listing
-  if (/directory|listing|search|discov|platform|opulist site/.test(t)) {
-    result.qtys.listing = 1;
-    result.reasons.listing = 'Discovery / directory placement mentioned';
+  // Derive active qtys
+  let activeQtys, activeReasons;
+  if (state.customMode && state.qtys) {
+    const res = optimizePackage(state.budget, tier, state.qtys, state.rfpSignals);
+    activeQtys    = res.qtys;
+    activeReasons = res.reasons;
   } else {
-    result.qtys.listing = 1; // always include as baseline
+    const res = optimizePackage(state.budget, tier, { ...tier.defaultQtys }, {});
+    activeQtys    = res.qtys;
+    activeReasons = res.reasons;
   }
 
-  // City guide
-  if (/city guide|guide to|roundup|best of|top .* in/.test(t)) {
-    result.qtys.cityguide = 1;
-    result.reasons.cityguide = 'City guide / roundup mentioned in RFP';
-  }
+  state._activeQtys    = activeQtys;
+  state._activeReasons = activeReasons;
+  state._tier          = tier;
 
-  // Images / licensed assets
-  if (/licens|content rights|image rights|asset|photography|photo rights/.test(t)) {
-    result.qtys.images = 1;
-    result.reasons.images = 'Licensed assets / content rights mentioned';
-  }
+  const res = calcResult(activeQtys);
+  state._result = res;
 
-  // Event
-  if (/event|activat|co.host|experienc|pop.up|pop up|party|gathering|gathering|launch event/.test(t)) {
-    result.qtys.event = 1;
-    result.reasons.event = 'Event / activation mentioned in RFP';
-  }
+  // Update tier banner
+  const banner = document.getElementById('tier-banner');
+  banner.className = 'tier-banner ' + tier.bannerClass;
+  document.getElementById('tier-badge').className   = 'tier-badge ' + tier.badgeClass;
+  document.getElementById('tier-badge').textContent = tier.id.charAt(0).toUpperCase() + tier.id.slice(1);
+  document.getElementById('tier-name').textContent  = tier.name;
+  document.getElementById('tier-desc').textContent  = tier.desc;
+  document.getElementById('tier-price-range').textContent = tier.priceRange;
+  document.getElementById('tier-cpm-range').textContent   = tier.cpmRange;
 
-  return result;
+  // Update stats
+  document.getElementById('stat-impressions').textContent = fmtImpressions(res.totalImp);
+  document.getElementById('stat-price').textContent       = fmtCurrency(res.totalPrice);
+  document.getElementById('stat-ecpm').textContent        = res.eCPM > 0 ? '$' + res.eCPM.toFixed(2) : '—';
+  document.getElementById('stat-pieces').textContent      = res.contentPieces;
+
+  // CPM gauge
+  updateGauge(res.eCPM, tier);
+
+  // Channel breakdown
+  renderBreakdown(res.channelMap, res.totalImp);
+
+  // Active tab content
+  renderActiveTab();
 }
 
-// Helper: extract a number near a keyword
-function extractNumber(text, keywords) {
-  for (const kw of keywords) {
-    const re = new RegExp('(\\d+)\\s*(?:x\\s*)?' + kw.replace(/\s+/g,'\\s+') + '|' + kw.replace(/\s+/g,'\\s+') + '\\s*(?:x\\s*)?(\\d+)', 'i');
-    const m = text.match(re);
-    if (m) {
-      const n = parseInt(m[1] || m[2]);
-      if (n > 0 && n < 25) return n;
-    }
-  }
-  return null;
+// ════════════════════════════════════════════════════
+// CPM GAUGE
+// ════════════════════════════════════════════════════
+
+function updateGauge(eCPM, tier) {
+  const GAUGE_MAX = 30;
+  const needle = document.getElementById('gauge-needle');
+  const zone   = document.getElementById('gauge-zone');
+  const label  = document.getElementById('gauge-val-label');
+
+  const pct = v => Math.min(100, Math.max(0, (v / GAUGE_MAX) * 100));
+  const zoneLeft  = pct(tier.cpmMin);
+  const zoneRight = pct(tier.cpmMax);
+  zone.style.left  = zoneLeft + '%';
+  zone.style.width = (zoneRight - zoneLeft) + '%';
+
+  const needlePct = pct(eCPM);
+  needle.style.left = needlePct + '%';
+
+  const inRange = eCPM >= tier.cpmMin && eCPM <= tier.cpmMax;
+  needle.className = 'gauge-needle ' + (inRange ? 'in-range' : 'out-range');
+  label.className  = 'gauge-val '    + (inRange ? 'in-range' : 'out-range');
+  label.textContent = eCPM > 0
+    ? (inRange ? '✓ $' : '⚠ $') + eCPM.toFixed(2) + ' eCPM'
+    : '—';
 }
 
-// ============================================================
-// APPLY RFP RESULT
-// ============================================================
-function applyRFPResult(result, filename) {
-  state.rfpApplied = true;
+// ════════════════════════════════════════════════════
+// RENDER: PACKAGE TAB
+// ════════════════════════════════════════════════════
+
+function renderPackage() {
+  const { breakdown } = state._result;
+  const reasons = state._activeReasons ?? {};
+  const el = document.getElementById('pkg-list');
+
+  if (!breakdown.length) {
+    el.innerHTML = '<p style="color:var(--text-muted);font-size:.8rem;font-family:system-ui,sans-serif;padding:12px 0;">No deliverables selected. Adjust your budget.</p>';
+    return;
+  }
+
+  el.innerHTML = breakdown.map(item => `
+    <div class="pkg-item">
+      <div class="pkg-dot" style="background:${item.color}"></div>
+      <div class="pkg-info">
+        <div class="pkg-name">${item.qty > 1 ? item.qty + '× ' : ''}${item.name}</div>
+        <div class="pkg-desc">${item.desc}</div>
+        ${reasons[item.id] ? `<div class="pkg-reason">💡 ${reasons[item.id]}</div>` : ''}
+      </div>
+      <div class="pkg-right">
+        <div class="pkg-price">${fmtCurrency(item.price)}</div>
+        ${item.impressionsEach > 0 ? `<div class="pkg-imp">${fmtImpressions(item.imp)} impr.</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════════════════
+// RENDER: CUSTOM BUILD TAB
+// ════════════════════════════════════════════════════
+
+function renderCustom() {
+  const activeQtys = state._activeQtys ?? {};
+  const el = document.getElementById('custom-list');
+
+  el.innerHTML = DELIVERABLES.map(d => {
+    const qty   = activeQtys[d.id] ?? 0;
+    const price = d.priceEach * qty;
+    return `
+      <div class="custom-item">
+        <div class="custom-dot" style="background:${d.color}"></div>
+        <div class="custom-info">
+          <div class="custom-name">${d.name}</div>
+          <div class="custom-unit">${fmtCurrency(d.priceEach)} / ${d.unit}${d.impressionsEach > 0 ? ' · ' + fmtImpressions(d.impressionsEach) + ' impr.' : ''}</div>
+        </div>
+        <div class="qty-ctrl">
+          <button class="qty-btn" onclick="adjustQty('${d.id}',-1)">−</button>
+          <div class="qty-num" id="qty-num-${d.id}">${qty}</div>
+          <button class="qty-btn" onclick="adjustQty('${d.id}',1)">+</button>
+        </div>
+        <div class="custom-price" id="qty-price-${d.id}">${qty > 0 ? fmtCurrency(price) : '—'}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function adjustQty(id, delta) {
+  const activeQtys = state._activeQtys ?? {};
+  const cap = QTY_CAPS[id] ?? 4;
+  const newQty = Math.max(0, Math.min(cap, (activeQtys[id] ?? 0) + delta));
+
+  // Enter custom mode with current optimized qtys as base
   state.customMode = true;
-  state.rfpReasons = result.reasons;
-  state.rfpExtracted = result.extracted;
+  state.qtys = { ...activeQtys, [id]: newQty };
+  update();
+}
 
-  // Apply deliverable quantities
-  Object.assign(state.qtys, result.qtys);
+// ════════════════════════════════════════════════════
+// RENDER: PROPOSAL SUMMARY TAB
+// ════════════════════════════════════════════════════
 
-  // Apply detected fields
-  if (result.clientName && !document.getElementById('clientName').value) {
-    document.getElementById('clientName').value = result.clientName;
+function renderSummary() {
+  const text = buildProposalText();
+  document.getElementById('proposal-text').textContent = text;
+}
+
+function buildProposalText() {
+  const { totalImp, totalPrice, contentPieces, breakdown, eCPM } = state._result;
+  const tier     = state._tier;
+  const client   = state.clientName || '[Client Name]';
+  const divider  = '─'.repeat(48);
+  const typeLabel = TYPE_LABELS[state.campaignType] ?? state.campaignType;
+  const durLabel  = DURATION_LABELS[state.duration] ?? state.duration;
+
+  let text = `${client.toUpperCase()} × OPULIST — PARTNERSHIP PROPOSAL\n${divider}\n`;
+  text += `Package:   ${tier.name}\nType:      ${typeLabel}\nDuration:  ${durLabel}\n\nDELIVERABLES\n`;
+
+  for (const item of breakdown) {
+    const q   = item.qty > 1 ? `${item.qty}× ` : '';
+    const imp = item.impressionsEach > 0 ? `  [${fmtImpressions(item.imp)} impr.]` : '';
+    text += `  • ${q}${item.name}${imp}  ${fmtCurrency(item.price)}\n`;
+  }
+
+  text += `\n${divider}\n`;
+  text += `Est. Total Impressions:  ${fmtFull(totalImp)}\n`;
+  text += `Content Pieces:          ${contentPieces}\n`;
+  text += `Effective CPM:           $${eCPM.toFixed(2)}\n`;
+  text += `Total Investment:        ${fmtCurrency(totalPrice)}\n`;
+  text += `\nAUDIENCE\n${AUDIENCE_LINE}`;
+
+  return text;
+}
+
+// ════════════════════════════════════════════════════
+// RENDER: IMPRESSION BREAKDOWN
+// ════════════════════════════════════════════════════
+
+function renderBreakdown(channelMap, totalImp) {
+  const el = document.getElementById('breakdown-bars');
+  const entries = Object.entries(channelMap).sort((a,b) => b[1]-a[1]);
+
+  if (!entries.length) {
+    el.innerHTML = '<p style="color:var(--text-muted);font-size:.78rem;font-family:system-ui,sans-serif;">No impression data yet.</p>';
+    return;
+  }
+
+  el.innerHTML = entries.map(([ch, imp]) => {
+    const pct   = totalImp > 0 ? (imp / totalImp * 100).toFixed(1) : 0;
+    const color = CHANNEL_COLORS[ch] ?? '#888';
+    return `
+      <div class="breakdown-bar-row">
+        <div class="bar-header">
+          <span class="bar-ch">${ch}</span>
+          <span class="bar-pct">${fmtImpressions(imp)} (${pct}%)</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${pct}%;background:${color}"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════
+// COPY PROPOSAL
+// ════════════════════════════════════════════════════
+
+function copyProposal(source) {
+  const text = buildProposalText();
+  const btnMain   = document.getElementById('btn-copy-main');
+  const btnInline = document.getElementById('btn-copy-inline');
+  const btn = source === 'main' ? btnMain : btnInline;
+
+  function markCopied() {
+    btn.textContent = source === 'main' ? '✓ Copied!' : '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = source === 'main' ? 'Copy Proposal to Clipboard' : 'Copy Text';
+      btn.classList.remove('copied');
+    }, 2500);
+  }
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(markCopied).catch(() => showCopyModal(text));
+  } else {
+    showCopyModal(text);
+  }
+}
+
+function showCopyModal(text) {
+  const ta = document.getElementById('modal-textarea');
+  ta.value = text;
+  document.getElementById('copy-modal').classList.add('open');
+  setTimeout(() => { ta.select(); }, 100);
+}
+
+// ════════════════════════════════════════════════════
+// METHODOLOGY TOGGLE
+// ════════════════════════════════════════════════════
+
+function toggleMeth() {
+  const toggle = document.getElementById('meth-toggle');
+  const body   = document.getElementById('meth-body');
+  toggle.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+// ════════════════════════════════════════════════════
+// RFP / PDF UPLOAD
+// ════════════════════════════════════════════════════
+
+function clearRFP() {
+  state.rfpApplied = false;
+  state.rfpFilename = '';
+  state.rfpSignals = {};
+  state.customMode = false;
+  state.qtys = null;
+  document.getElementById('rfp-banner').style.display = 'none';
+  document.getElementById('upload-zone').classList.remove('has-file');
+  document.getElementById('upload-zone').innerHTML = `
+    <div class="upload-icon">📄</div>
+    <div class="upload-text">
+      <strong>Drop PDF or click to upload</strong>
+      Drag &amp; drop your RFP here to auto-populate fields
+    </div>`;
+  document.getElementById('highlight-chips').style.display = 'none';
+  document.getElementById('highlight-chips').innerHTML = '';
+  update();
+}
+
+function applyRFPResult(result, filename) {
+  state.rfpApplied  = true;
+  state.rfpFilename = filename;
+  state.rfpSignals  = result.reasons ?? {};
+  state.customMode  = true;
+
+  const tier = getTier(state.budget);
+  state.qtys = { ...tier.defaultQtys, ...(result.qtys ?? {}) };
+
+  if (result.clientName && !state.clientName) {
+    document.getElementById('client-name').value = result.clientName;
     state.clientName = result.clientName;
   }
   if (result.budget) {
     state.budget = result.budget;
-    document.getElementById('budgetInput').value = result.budget;
-    document.getElementById('budgetSlider').value = Math.min(result.budget, 50000);
-    document.getElementById('budgetHero').textContent = fmtCurrency(result.budget);
+    document.getElementById('budget-slider').value = Math.min(result.budget, 50000);
+    document.getElementById('budget-input').value  = result.budget;
+    document.getElementById('budget-hero').textContent = '$' + result.budget.toLocaleString('en-US');
   }
   if (result.duration) document.getElementById('duration').value = result.duration;
-  if (result.campaignType) document.getElementById('campaignType').value = result.campaignType;
+  if (result.campaignType) document.getElementById('campaign-type').value = result.campaignType;
 
-  // Show applied banner
-  const chips = Object.values(result.extracted);
-  document.getElementById('rfpBannerText').textContent =
-    `Package built from "${filename}" — ${chips.length} signal${chips.length!==1?'s':''} extracted`;
-  document.getElementById('rfpBanner').classList.add('visible');
+  // Banner
+  document.getElementById('rfp-banner').style.display = 'flex';
+  document.getElementById('rfp-banner-file').textContent = `✅ ${filename}`;
+  const signals = Object.keys(result.extracted ?? {});
+  document.getElementById('rfp-banner-signals').textContent =
+    signals.length ? `${signals.length} signal${signals.length !== 1 ? 's' : ''} extracted` : 'Analyzed';
 
-  // Show highlight chips
-  const chipContainer = document.getElementById('highlightChips');
-  chipContainer.innerHTML = Object.entries(result.extracted)
-    .map(([k,v]) => `<span class="highlight-chip">${labelKey(k)}: ${v}</span>`)
-    .join('');
-  document.getElementById('rfpHighlights').classList.add('visible');
+  // Upload zone
+  const zone = document.getElementById('upload-zone');
+  zone.classList.add('has-file');
+  zone.innerHTML = `
+    <div class="upload-icon">✅</div>
+    <div class="upload-text"><strong>${filename}</strong>RFP applied — fields auto-populated</div>
+    <div class="upload-filename">
+      <span>${filename}</span>
+      <button class="upload-clear" onclick="event.stopPropagation();clearRFP()">✕</button>
+    </div>`;
 
-  update();
-}
-
-function labelKey(k) {
-  return { budget:'Budget', duration:'Duration', type:'Type', client:'Client', goals:'Goals', audience:'Audience', markets:'Markets' }[k] || k;
-}
-
-function clearRFPApplied() {
-  state.rfpApplied = false;
-  state.customMode = false;
-  state.rfpReasons = {};
-  state.rfpExtracted = {};
-  document.getElementById('rfpBanner').classList.remove('visible');
-  document.getElementById('rfpHighlights').classList.remove('visible');
-  update();
-}
-
-// ============================================================
-// MAIN UPDATE
-// ============================================================
-function update() {
-  state.clientName = document.getElementById('clientName').value;
-  state.campaignType = document.getElementById('campaignType').value;
-  state.duration = document.getElementById('duration').value;
-
-  const tier = getTier();
-
-  if (!state.customMode) {
-    state.qtys = { ...tier.defaultQtys };
+  // Chips
+  const chipsEl = document.getElementById('highlight-chips');
+  const extracted = result.extracted ?? {};
+  const chipKeys = Object.keys(extracted);
+  if (chipKeys.length) {
+    chipsEl.style.display = 'flex';
+    chipsEl.innerHTML = chipKeys.map(k => `<span class="chip">${k}: ${extracted[k]}</span>`).join('');
   }
 
-  const { totalImpressions, totalPrice, contentPieces, breakdown, channelMap } = calc();
-  const eCPM = totalImpressions > 0 ? (totalPrice / totalImpressions * 1000) : 0;
-
-  // Tier banner
-  document.getElementById('tierBanner').className = 'tier-banner ' + tier.bannerClass;
-  document.getElementById('tierBadge').className = 'tier-badge ' + tier.badgeClass;
-  document.getElementById('tierBadge').textContent = tier.name;
-  document.getElementById('tierName').textContent = tier.name;
-  document.getElementById('tierDesc').textContent = tier.desc;
-  document.getElementById('tierPriceRange').textContent = tier.priceRange;
-  document.getElementById('tierCPMRef').textContent = 'eCPM benchmark: ' + tier.cpmRange;
-
-  // Stats
-  document.getElementById('statImpressions').textContent = fmtImpressions(totalImpressions);
-  document.getElementById('statCPM').textContent = eCPM > 0 ? '$' + eCPM.toFixed(2) : '—';
-  document.getElementById('statInvestment').textContent = fmtCurrency(totalPrice);
-  document.getElementById('statPieces').textContent = contentPieces;
-  document.getElementById('statDuration').textContent =
-    { 'one-time':'one-time','quarterly':'per quarter','annual':'per year' }[state.duration];
-
-  // Gauge
-  updateGauge(eCPM, tier);
-
-  // Render tabs
-  renderPackage(breakdown);
-  renderCustom();
-  renderSummary(totalImpressions, totalPrice, eCPM, breakdown, tier, contentPieces);
-  renderBreakdown(channelMap, totalImpressions);
+  update();
 }
 
-function getTier() {
-  for (const t of TIERS) if (state.budget >= t.minBudget && state.budget <= t.maxBudget) return t;
-  return TIERS[TIERS.length-1];
-}
+// ── RFP text extraction ──
 
-function calc() {
-  let totalImpressions=0, totalPrice=0, contentPieces=0;
-  const breakdown=[], channelMap={};
-  DELIVERABLES.forEach(d => {
-    const qty = state.qtys[d.id] || 0;
-    if (qty > 0) {
-      const imp = d.impressionsEach * qty;
-      const price = d.priceEach * qty;
-      totalImpressions += imp; totalPrice += price;
-      if (d.id !== 'images') contentPieces += qty;
-      breakdown.push({...d, qty, imp, price});
-      d.channels.forEach(ch => { if (d.impressionsEach > 0) channelMap[ch] = (channelMap[ch]||0) + imp; });
-    }
-  });
-  return { totalImpressions, totalPrice, contentPieces, breakdown, channelMap };
-}
+function analyzeRFP(text) {
+  const result = {
+    clientName: null, budget: null, duration: null,
+    campaignType: null, qtys: {}, reasons: {}, extracted: {}
+  };
 
-// ============================================================
-// GAUGE
-// ============================================================
-function updateGauge(eCPM, tier) {
-  const MIN=5, MAX=30;
-  const pct = v => Math.min(Math.max(((v-MIN)/(MAX-MIN))*100, 0), 100);
-  document.getElementById('gaugeRange').style.left  = pct(tier.cpmMin) + '%';
-  document.getElementById('gaugeRange').style.width = (pct(tier.cpmMax) - pct(tier.cpmMin)) + '%';
-  document.getElementById('gaugeNeedle').style.left  = pct(eCPM) + '%';
-  document.getElementById('cpmStatusVal').textContent = eCPM > 0 ? '$' + eCPM.toFixed(2) : '—';
-  const inRange = eCPM >= tier.cpmMin && eCPM <= tier.cpmMax;
-  const color = eCPM === 0 ? 'var(--text-muted)' : inRange ? 'var(--green)' : eCPM < tier.cpmMin ? 'var(--text-muted)' : 'var(--amber)';
-  const label = eCPM === 0 ? 'Add deliverables' : inRange ? '✓ Within benchmark' : eCPM < tier.cpmMin ? '↓ Below benchmark' : '↑ Above benchmark';
-  document.getElementById('cpmStatusLabel').textContent = label;
-  document.getElementById('cpmStatusLabel').style.color = color;
-  document.getElementById('gaugeNeedle').style.background = inRange ? 'var(--green)' : 'var(--accent)';
-}
+  // Client name
+  const nameMatch = text.match(/(?:client|brand|company|property|hotel|resort)[:\s]+([A-Z][A-Za-z\s&'.-]{2,40})/i);
+  if (nameMatch) { result.clientName = nameMatch[1].trim(); result.extracted['Client'] = result.clientName; }
 
-// ============================================================
-// RENDER: PACKAGE TAB
-// ============================================================
-function renderPackage(breakdown) {
-  if (!breakdown.length) { document.getElementById('packageContent').innerHTML = '<div class="empty-msg">No deliverables in this package.</div>'; return; }
-  let html = '';
-  breakdown.forEach(item => {
-    const reason = state.rfpReasons[item.id];
-    const qLabel = item.qty > 1 ? item.qty + '× ' : '';
-    const impLabel = item.impressionsEach > 0 ? fmtImpressions(item.imp) + ' est. impressions' : 'Asset only';
-    html += `
-      <div class="pkg-row">
-        <div>
-          <span class="pkg-check">✓</span><span class="pkg-name">${qLabel}${item.name}</span>
-          <div class="pkg-detail">${impLabel}</div>
-          ${reason ? `<div class="rfp-reason">↳ ${reason}</div>` : ''}
-        </div>
-        <div class="pkg-price">${fmtCurrency(item.price)}</div>
-      </div>`;
-  });
-  document.getElementById('packageContent').innerHTML = html;
-}
-
-// ============================================================
-// RENDER: CUSTOM TAB
-// ============================================================
-function renderCustom() {
-  let html = '';
-  DELIVERABLES.forEach(d => {
-    const qty = state.qtys[d.id] || 0;
-    html += `
-      <div class="dlv-row">
-        <div class="dlv-info">
-          <div class="dlv-name">${d.name}</div>
-          <div class="dlv-sub">${fmtCurrency(d.priceEach)}/${d.unit} · ${d.impressionsEach > 0 ? fmtImpressions(d.impressionsEach)+' impr. each' : 'asset only'}</div>
-        </div>
-        <div class="dlv-controls">
-          <button class="qty-btn" onclick="changeQty('${d.id}',-1)">−</button>
-          <div class="qty-num">${qty}</div>
-          <button class="qty-btn" onclick="changeQty('${d.id}',1)">+</button>
-          <div class="dlv-price">${qty > 0 ? fmtCurrency(d.priceEach*qty) : '—'}</div>
-        </div>
-      </div>`;
-  });
-  document.getElementById('customContent').innerHTML = html;
-}
-
-// ============================================================
-// RENDER: SUMMARY TAB
-// ============================================================
-function renderSummary(totalImpressions, totalPrice, eCPM, breakdown, tier, contentPieces) {
-  const client = state.clientName || '[Client Name]';
-  const durMap = { 'one-time':'One-Time','quarterly':'Quarterly','annual':'Annual' };
-  const typeMap = { destination:'Destination / Tourism',hotel:'Hotel / Resort',restaurant:'Restaurant / Bar',brand:'Lifestyle Brand',event:'Event / Experience' };
-  let rows = breakdown.map(item => `
-    <div class="sum-row">
-      <span class="l">${item.qty>1?item.qty+'× ':''}${item.name}${item.impressionsEach>0?' <span style="color:var(--text-muted);font-size:11px;">['+fmtImpressions(item.imp)+']</span>':''}</span>
-      <span class="r">${fmtCurrency(item.price)}</span>
-    </div>`).join('');
-  document.getElementById('summaryContent').innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border);">
-      <div>
-        <div class="sum-client">${client} × Opulist</div>
-        <div class="sum-meta">${tier.name} · ${durMap[state.duration]} · ${typeMap[state.campaignType]}</div>
-      </div>
-      <button class="btn-copy-sm" id="btnCopySm" onclick="copyProposal('sm')">Copy ↗</button>
-    </div>
-    ${rows}
-    <div class="sum-divider"></div>
-    <div class="sum-row"><span class="l">Content Pieces</span><span class="r">${contentPieces}</span></div>
-    <div class="sum-row"><span class="l">Est. Total Impressions</span><span class="r">${fmtImpressions(totalImpressions)}</span></div>
-    <div class="sum-row"><span class="l">Effective CPM</span><span class="r">${eCPM > 0 ? '$'+eCPM.toFixed(2) : '—'}</span></div>
-    <div class="sum-row total"><span class="l">Total Investment</span><span class="r">${fmtCurrency(totalPrice)}</span></div>
-    <div style="margin-top:16px;padding:12px;background:var(--surface2);border-radius:4px;font-family:Arial;font-size:10px;color:var(--text-muted);line-height:1.8;">
-      <strong style="color:var(--text-mid);display:block;margin-bottom:3px;">Opulist Audience</strong>
-      100K Instagram followers · 2M monthly views · 9% engagement<br>83% female · Ages 25–44 · NYC, LA, Austin<br>Creative professionals · Hospitality insiders · Design-forward travelers
-    </div>`;
-}
-
-// ============================================================
-// RENDER: BREAKDOWN
-// ============================================================
-function renderBreakdown(channelMap, totalImpressions) {
-  if (!Object.keys(channelMap).length || totalImpressions === 0) {
-    document.getElementById('breakdownContent').innerHTML = '<div class="empty-msg">No impressions to display yet.</div>'; return;
+  // Budget
+  const budgetMatch = text.match(/\$\s*([\d,]+)(?:\s*[-–]\s*\$?\s*([\d,]+))?/);
+  if (budgetMatch) {
+    const lo = parseInt(budgetMatch[1].replace(/,/g, ''));
+    const hi = budgetMatch[2] ? parseInt(budgetMatch[2].replace(/,/g, '')) : lo;
+    const mid = Math.round((lo + hi) / 2 / 500) * 500;
+    if (mid >= 2000 && mid <= 200000) { result.budget = mid; result.extracted['Budget'] = `$${mid.toLocaleString()}`; }
   }
-  const colors = { 'Instagram Feed':'#8b6b3d','Instagram Stories':'#b08acc','Email / Newsletter':'#4a7a56','Website / Blog':'#7a9ab8','Website / Directory':'#a06820' };
-  let html = Object.entries(channelMap).sort((a,b)=>b[1]-a[1]).map(([ch,imp]) => {
-    const pct = Math.round((imp/totalImpressions)*100);
-    return `<div class="bk-row">
-      <div class="bk-top"><span class="bk-channel">${ch}</span><span class="bk-count">${fmtImpressions(imp)} <span style="color:var(--text-muted)">(${pct}%)</span></span></div>
-      <div class="bk-bar-bg"><div class="bk-bar-fill" style="width:${pct}%;background:${colors[ch]||'#8b6b3d'};"></div></div>
-    </div>`;
-  }).join('');
-  document.getElementById('breakdownContent').innerHTML = html;
+
+  // Duration
+  if (/annual|year[- ]?long|12.month/i.test(text))       { result.duration = 'annual';    result.extracted['Duration'] = 'Annual'; }
+  else if (/quarter|3.month|seasonal/i.test(text))        { result.duration = 'quarterly'; result.extracted['Duration'] = 'Quarterly'; }
+  else if (/one.time|single|one.off/i.test(text))         { result.duration = 'one-time';  result.extracted['Duration'] = 'One-Time'; }
+
+  // Campaign type
+  if (/hotel|resort|boutique|property|accommodat/i.test(text))      { result.campaignType = 'hotel';       result.extracted['Type'] = 'Hotel'; }
+  else if (/restaurant|dining|cuisine|chef|food/i.test(text))        { result.campaignType = 'restaurant';  result.extracted['Type'] = 'Restaurant'; }
+  else if (/destination|city|region|tourism|travel/i.test(text))     { result.campaignType = 'destination'; result.extracted['Type'] = 'Destination'; }
+  else if (/event|launch|opening|gala|festival/i.test(text))         { result.campaignType = 'event';       result.extracted['Type'] = 'Event'; }
+
+  // Deliverables
+  if (/instagram.*(reel|carousel|feed|post)|feed.*(feature|post)/i.test(text))      { result.qtys.feed = 2; result.reasons.feed = 'Mentioned in RFP'; result.extracted['Feed Posts'] = 'Detected'; }
+  if (/stor(y|ies)|instagram.stor/i.test(text))                                      { result.qtys.story = 2; result.reasons.story = 'Mentioned in RFP'; }
+  if (/newsletter|email.*(blast|campaign|placement)/i.test(text))                    { result.qtys.newsletter = 1; result.reasons.newsletter = 'Mentioned in RFP'; result.extracted['Newsletter'] = 'Detected'; }
+  if (/editorial|blog.*(post|feature)|long.form|article/i.test(text))               { result.qtys.editorial = 1; result.reasons.editorial = 'Mentioned in RFP'; }
+  if (/listing|director(y|ies)|search.platform/i.test(text))                         { result.qtys.listing = 1; result.reasons.listing = 'Mentioned in RFP'; }
+  if (/city.guide|guide.inclus/i.test(text))                                          { result.qtys.cityguide = 1; result.reasons.cityguide = 'Mentioned in RFP'; }
+  if (/event|co.host|sponsor.*event|hosted.*event/i.test(text))                     { result.qtys.event = 1; result.reasons.event = 'Mentioned in RFP'; }
+  if (/image|photo|licens/i.test(text))                                              { result.qtys.images = 1; result.reasons.images = 'Mentioned in RFP'; }
+
+  return result;
 }
 
-// ============================================================
-// INTERACTIONS
-// ============================================================
-function changeQty(id, delta) {
-  state.customMode = true;
-  state.qtys[id] = Math.max(0, (state.qtys[id]||0) + delta);
-  update();
-}
+async function extractPDFText(file) {
+  // Try PDF.js from CDN
+  if (!window.pdfjsLib) {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+  }
 
-function switchTab(tab, btn) {
-  if (tab === 'custom') state.customMode = true;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('tab-'+tab).classList.add('active');
-  update();
-}
-
-function buildProposalText() {
-  const { totalImpressions, totalPrice, contentPieces, breakdown } = calc();
-  const eCPM = totalImpressions > 0 ? (totalPrice/totalImpressions*1000) : 0;
-  const tier = getTier();
-  const client = state.clientName || '[Client Name]';
-  const durMap = { 'one-time':'One-Time','quarterly':'Quarterly','annual':'Annual' };
-  const typeMap = { destination:'Destination / Tourism',hotel:'Hotel / Resort',restaurant:'Restaurant / Bar',brand:'Lifestyle Brand',event:'Event / Experience' };
-  let text = `${client.toUpperCase()} × OPULIST — PARTNERSHIP PROPOSAL\n${'─'.repeat(50)}\n`;
-  text += `Package:   ${tier.name}\nType:      ${typeMap[state.campaignType]}\nDuration:  ${durMap[state.duration]}\n\nDELIVERABLES\n`;
-  breakdown.forEach(item => {
-    const q = item.qty > 1 ? item.qty+'× ' : '   ';
-    const imp = item.impressionsEach > 0 ? `  [${fmtImpressions(item.imp)} impr.]` : '             ';
-    text += `  • ${q}${item.name.padEnd(36)}${imp}  ${fmtCurrency(item.price)}\n`;
-  });
-  text += `\n${'─'.repeat(50)}\n`;
-  text += `Est. Total Impressions:  ${fmtImpressions(totalImpressions)}\n`;
-  text += `Content Pieces:          ${contentPieces}\n`;
-  text += `Effective CPM:           $${eCPM.toFixed(2)}\n`;
-  text += `Total Investment:        ${fmtCurrency(totalPrice)}\n`;
-  text += `\nOPULIST AUDIENCE\n`;
-  text += `100K followers · 2M monthly views · 9% engagement rate\n`;
-  text += `83% female · Ages 25–44 · NYC, LA, Austin\n`;
-  text += `Creative professionals · Hospitality insiders · Design-forward travelers`;
+  const buffer = await file.arrayBuffer();
+  const pdf    = await pdfjsLib.getDocument({ data: buffer }).promise;
+  let text = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page    = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map(it => it.str).join(' ') + '\n';
+  }
   return text;
 }
 
-function copyProposal(source) {
-  const text = buildProposalText();
-  const mainBtn = document.getElementById('btnExport');
-  const smBtn = document.getElementById('btnCopySm');
+// ── Upload zone events ──
 
-  const setSuccess = () => {
-    if (mainBtn) { mainBtn.classList.add('copied'); document.getElementById('exportIcon').textContent = '✓'; document.getElementById('exportLabel').textContent = 'Copied!'; }
-    if (smBtn) { smBtn.classList.add('copied'); smBtn.textContent = '✓ Copied'; }
-    setTimeout(() => {
-      if (mainBtn) { mainBtn.classList.remove('copied'); document.getElementById('exportIcon').textContent = '↗'; document.getElementById('exportLabel').textContent = 'Copy Proposal Summary'; }
-      if (smBtn) { smBtn.classList.remove('copied'); smBtn.textContent = 'Copy ↗'; }
-    }, 2500);
-  };
+const uploadZone = document.getElementById('upload-zone');
+const fileInput  = document.getElementById('file-input');
 
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(setSuccess).catch(() => showFallback(text));
-  } else {
-    showFallback(text);
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) handleFile(fileInput.files[0]);
+});
+
+async function handleFile(file) {
+  const zone = document.getElementById('upload-zone');
+  zone.innerHTML = `<div class="upload-text"><span class="spinner"></span>Analyzing RFP…</div>`;
+
+  try {
+    let text = '';
+    if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+      text = await extractPDFText(file);
+    } else {
+      text = await file.text();
+    }
+
+    const result = analyzeRFP(text);
+    applyRFPResult(result, file.name);
+  } catch (err) {
+    zone.innerHTML = `
+      <div class="upload-icon">⚠️</div>
+      <div class="upload-text"><strong>Could not parse file</strong>${err.message}</div>`;
+    console.error(err);
   }
 }
 
-function showFallback(text) {
-  // Fallback: show a modal with the text pre-selected
-  const modal = document.createElement('div');
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:9999;';
-  modal.innerHTML = `
-    <div style="background:white;border-radius:8px;padding:24px;max-width:560px;width:90%;max-height:80vh;overflow:auto;">
-      <div style="font-family:Arial;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#9a8d7d;margin-bottom:12px;">Select all and copy ↓</div>
-      <textarea id="fallbackText" style="width:100%;height:300px;font-family:monospace;font-size:12px;border:1px solid #ddd;border-radius:4px;padding:12px;resize:none;" readonly>${text}</textarea>
-      <div style="display:flex;justify-content:flex-end;margin-top:12px;">
-        <button onclick="this.closest('div[style]').remove()" style="font-family:Arial;font-size:10px;letter-spacing:2px;text-transform:uppercase;background:#1a1510;color:#f5f0e8;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;">Close</button>
-      </div>
-    </div>`;
-  document.body.appendChild(modal);
-  modal.addEventListener('click', e => { if(e.target === modal) modal.remove(); });
-  setTimeout(() => { const ta = document.getElementById('fallbackText'); if(ta){ta.focus();ta.select();} }, 100);
-}
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
 
-function toggleMethodology() {
-  const body = document.getElementById('methodologyBody');
-  const arrow = document.getElementById('methArrow');
-  body.classList.toggle('open');
-  arrow.textContent = body.classList.contains('open') ? '▾' : '▸';
-}
-
-// ============================================================
-// FORMATTERS
-// ============================================================
-function fmtCurrency(n) {
-  if (!n || n===0) return '$0';
-  if (n >= 1000000) return '$'+(n/1000000).toFixed(1)+'M';
-  if (n >= 1000) { const k=n/1000; return '$'+(Number.isInteger(k)?k:k.toFixed(1))+'K'; }
-  return '$'+n.toLocaleString();
-}
-function fmtImpressions(n) {
-  if (!n||n===0) return '0';
-  if (n>=1000000) return (n/1000000).toFixed(1)+'M';
-  if (n>=1000) return Math.round(n/1000)+'K';
-  return n.toLocaleString();
-}
+update();
 </script>
 </body>
 </html>
