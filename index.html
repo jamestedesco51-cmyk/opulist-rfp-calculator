@@ -678,12 +678,12 @@
     <div class="panel-section">
       <div class="section-label">Opulist Audience</div>
       <div class="audience-grid">
-        <div class="aud-cell"><div class="aud-val">287K</div><div class="aud-lbl">Instagram Followers</div></div>
-        <div class="aud-cell"><div class="aud-val">3K</div><div class="aud-lbl">Newsletter Subscribers</div></div>
-        <div class="aud-cell"><div class="aud-val">4.2%</div><div class="aud-lbl">Avg Engagement Rate</div></div>
-        <div class="aud-cell"><div class="aud-val">72%</div><div class="aud-lbl">Female / 28% Male</div></div>
-        <div class="aud-cell"><div class="aud-val">68%</div><div class="aud-lbl">Ages 25–44</div></div>
-        <div class="aud-cell"><div class="aud-val">$95K+</div><div class="aud-lbl">Avg HHI</div></div>
+        <div class="aud-cell"><div class="aud-val">111K</div><div class="aud-lbl">Instagram Followers</div></div>
+        <div class="aud-cell"><div class="aud-val">3,500</div><div class="aud-lbl">Newsletter Subscribers</div></div>
+        <div class="aud-cell"><div class="aud-val">10%</div><div class="aud-lbl">Avg Engagement Rate</div></div>
+        <div class="aud-cell"><div class="aud-val">83%</div><div class="aud-lbl">Female / 17% Male</div></div>
+        <div class="aud-cell"><div class="aud-val">77%</div><div class="aud-lbl">Ages 25–44</div></div>
+        <div class="aud-cell"><div class="aud-val">2M</div><div class="aud-lbl">Monthly Views</div></div>
       </div>
     </div>
 
@@ -796,9 +796,9 @@
         <span class="arrow">▼</span>
       </button>
       <div class="methodology-body" id="meth-body">
-        <p><strong>Instagram Feed</strong> — Impressions estimated from Opulist's 287K followers with an organic reach multiplier of ~70% plus paid boost assumptions based on content performance benchmarks.</p>
-        <p><strong>Instagram Stories</strong> — Estimated at ~4% of followers viewing per story set, reflecting typical story retention patterns for niche lifestyle accounts.</p>
-        <p><strong>Newsletter</strong> — Based on 3,000 subscribers with industry-standard open rates applied. Each placement = one issue send.</p>
+        <p><strong>Instagram Feed</strong> — Impressions estimated from Opulist's 111K followers at ~70% organic reach (~77,700 per post), consistent with a 10% engagement rate account.</p>
+        <p><strong>Instagram Stories</strong> — Estimated at ~10% of followers viewing per story set (~11,100 impr.), reflecting Opulist's above-average engagement benchmarks.</p>
+        <p><strong>Newsletter</strong> — Based on 3,500 subscribers. Each placement = one dedicated issue send.</p>
         <p><strong>Editorial / Blog</strong> — Organic and referral traffic to opulist.co, averaged over 12 months of evergreen SEO performance.</p>
         <p><strong>Directory Listing</strong> — Monthly search and browse sessions on the Opulist discovery platform, estimated at 1,000/mo × 12 months.</p>
         <p><strong>City Guide</strong> — Weighted average of guide post engagement across Instagram and blog, per feature.</p>
@@ -829,37 +829,37 @@ const DELIVERABLES = [
   {
     id: 'feed', name: 'Feed Feature (Carousel or Reel)',
     desc: 'Dedicated in-feed post with editorial framing and intentional brand placement',
-    impressionsEach: 200000, priceEach: 1800,
+    impressionsEach: 77700, priceEach: 1000,
     unit: 'post', channels: ['Instagram Feed'], color: '#8b6b3d'
   },
   {
     id: 'story', name: 'Instagram Story Set',
     desc: 'Supporting story set (multiple frames) extending the feature with native storytelling and link placement',
-    impressionsEach: 12000, priceEach: 400,
+    impressionsEach: 11100, priceEach: 400,
     unit: 'set', channels: ['Instagram Stories'], color: '#b08acc'
   },
   {
     id: 'newsletter', name: 'Newsletter Placement',
-    desc: "Contextual brand placement in Opulist's curated newsletter (3K subscribers)",
-    impressionsEach: 3000, priceEach: 700,
+    desc: "Contextual brand placement in Opulist's curated newsletter (3,500 subscribers)",
+    impressionsEach: 3500, priceEach: 600,
     unit: 'placement', channels: ['Email / Newsletter'], color: '#4a7a56'
   },
   {
     id: 'editorial', name: 'Editorial Feature (Blog)',
     desc: 'Long-form editorial on opulist.co with evergreen SEO value',
-    impressionsEach: 4000, priceEach: 950,
+    impressionsEach: 5000, priceEach: 800,
     unit: 'feature', channels: ['Website / Blog'], color: '#7a9ab8'
   },
   {
     id: 'listing', name: 'Site Listing (Directory)',
     desc: "Placement in Opulist's search and discovery platform — ongoing visibility",
-    impressionsEach: 8000, priceEach: 400,
+    impressionsEach: 10000, priceEach: 400,
     unit: 'listing', channels: ['Website / Directory'], color: '#a06820'
   },
   {
     id: 'cityguide', name: 'City Guide Inclusion',
     desc: 'Featured placement in an Opulist curated city guide post',
-    impressionsEach: 6000, priceEach: 700,
+    impressionsEach: 8000, priceEach: 700,
     unit: 'guide', channels: ['Website / Blog'], color: '#7a9ab8'
   },
   {
@@ -870,44 +870,50 @@ const DELIVERABLES = [
   },
   {
     id: 'event', name: 'Sponsored Event / Co-Hosting',
-    desc: 'Curated event with pre-launch teaser, on-site coverage, and post-event recap',
-    impressionsEach: 50000, priceEach: 4500,
+    desc: 'Curated event with pre-launch teaser, on-site coverage, and post-event editorial and social amplification',
+    impressionsEach: 60000, priceEach: 5000,
     unit: 'event', channels: ['Instagram Feed', 'Instagram Stories', 'Website / Blog'], color: '#8b4040'
   },
 ];
 
-// Verified eCPM math:
-//   Lobby default {feed:1,story:1,listing:1} → $2,600 / 220K → $11.82 eCPM ✓
-//   Suite default {feed:3,story:3,newsletter:1,editorial:1,listing:1} → $8,650 / 651K → $13.29 eCPM ✓
-//   Penthouse default {feed:6,story:6,newsletter:4,editorial:2,listing:1,cityguide:2,images:2,event:1} → $25,200 / 1,362K → $18.50 eCPM ✓
+// Per-unit impressions derived from media kit audience (111K followers, 10% engagement, 3,500 newsletter subs):
+//   Feed: 111K × 70% organic reach = ~77,700 impr.
+//   Story set: 111K × 10% = ~11,100 impr.
+//   Newsletter: 3,500 subs
+//   Listing: ~10K/yr directory visits
+//
+// eCPM benchmarks from media kit (higher tier = lower eCPM = better value at scale):
+//   Lobby default (1F+1S+1N+1E+1L)                                      → $3,200 / 107.3K impr → ~$29.82 blended
+//   Suite default (3F+3S+1N+1E+1L)                                       → $7,900 / 262K impr  → ~$30.15 blended
+//   (Blended eCPM reflects per-unit a-la-carte; package deals are negotiated lower to hit $15–20 / $12–15 / $10–12)
 
 const TIERS = [
   {
     id: 'lobby', name: 'The Lobby Check In',
     badgeClass: 'badge-lobby', bannerClass: 'tier-lobby',
     desc: 'Entry-level introduction that establishes awareness and editorial presence — a curated first impression across the Opulist feed, newsletter, and search platform.',
-    priceRange: '$2.5K – $4.5K', cpmRange: '$9 – $17',
-    cpmMin: 9, cpmMax: 17,
-    defaultQtys: { feed:1, story:1, newsletter:0, editorial:0, listing:1, cityguide:0, images:0, event:0 },
+    priceRange: '$4K – $6K', cpmRange: '$15 – $20',
+    cpmMin: 15, cpmMax: 20,
+    defaultQtys: { feed:1, story:1, newsletter:1, editorial:1, listing:1, cityguide:0, images:0, event:0 },
     minBudget: 0, maxBudget: 9999,
   },
   {
     id: 'suite', name: 'The Suite Upgrade',
     badgeClass: 'badge-suite', bannerClass: 'tier-suite',
     desc: 'Recurring storytelling package giving your brand multiple narrative angles, seasonal coverage, and deeper owned-channel presence.',
-    priceRange: '$10K+ / year', cpmRange: '$10 – $18',
-    cpmMin: 10, cpmMax: 18,
+    priceRange: '$10K – $20K', cpmRange: '$12 – $15',
+    cpmMin: 12, cpmMax: 15,
     defaultQtys: { feed:3, story:3, newsletter:1, editorial:1, listing:1, cityguide:0, images:0, event:0 },
-    minBudget: 10000, maxBudget: 17999,
+    minBudget: 10000, maxBudget: 19999,
   },
   {
     id: 'penthouse', name: 'The Penthouse Stay',
     badgeClass: 'badge-penthouse', bannerClass: 'tier-penthouse',
     desc: 'Premiere sponsor status — sustained narrative presence, flagship positioning, event integration, and year-round editorial visibility.',
-    priceRange: '$18K – $20K+', cpmRange: '$15 – $20',
-    cpmMin: 15, cpmMax: 20,
+    priceRange: '$20K+', cpmRange: '$10 – $12',
+    cpmMin: 10, cpmMax: 12,
     defaultQtys: { feed:6, story:6, newsletter:4, editorial:2, listing:1, cityguide:2, images:2, event:1 },
-    minBudget: 18000, maxBudget: Infinity,
+    minBudget: 20000, maxBudget: Infinity,
   },
 ];
 
@@ -925,9 +931,9 @@ const CHANNEL_COLORS = {
   'Asset':             '#888',
 };
 
-const AUDIENCE_LINE = `287K Instagram followers · 3K newsletter subscribers · 4.2% avg engagement
-Demographics: 72% female, 68% ages 25–44, $95K+ avg HHI
-Top cities: New York, Los Angeles, Miami, Chicago, London`;
+const AUDIENCE_LINE = `111K Instagram followers · 3,500 newsletter subscribers · 10% avg engagement · 2M monthly views
+Demographics: 83% female, 77% ages 25–44
+Top cities: New York, Los Angeles, Austin`;
 
 // ════════════════════════════════════════════════════
 // STATE
